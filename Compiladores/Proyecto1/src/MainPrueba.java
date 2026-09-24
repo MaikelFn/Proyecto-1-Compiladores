@@ -1,31 +1,43 @@
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class MainPrueba {
 
     public static void main(String[] args) {
 
-        try {
-            // Leer el archivo fuente.
-            FileReader archivo = new FileReader("pruebas/Prueba.txt");
+        try (FileReader archivo = new FileReader(
+                "pruebas/Prueba.txt",
+                StandardCharsets.UTF_8)) {
 
-            // Crear el analizador léxico.
+            // Crear el analizador lexico.
             Lexer lexer = new Lexer(archivo);
 
             String token;
 
-            // Obtener los tokens hasta llegar al final.
+            // Recorrer todos los tokens del archivo.
             while ((token = lexer.yylex()) != null) {
 
+                String lexema = lexer.yytext();
+
+                // Obtener el valor Unicode de cada caracter.
+                StringBuilder unicode = new StringBuilder();
+
+                lexema.codePoints().forEach(c ->
+                    unicode.append(
+                        String.format("U+%04X ", c)
+                    )
+                );
+
+                // Mostrar la informacion del token.
                 System.out.println(
                     "Token: " + token
-                    + " | Lexema: " + lexer.yytext()
+                    + " | Lexema: " + lexema
+                    + " | Unicode: " + unicode
                     + " | Linea: " + lexer.getLinea()
                 );
             }
-
-            archivo.close();
 
         } catch (IOException e) {
             System.out.println(

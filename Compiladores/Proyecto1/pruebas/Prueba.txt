@@ -1,18 +1,9 @@
 
-val int edad
-float
-bool
-char
-string
-void
-principal
-if
-elif
-else
-while
-for
-return
-break
-read
-write
-variable1
+¿:
+:?
+є:
+:э
+ʃ:
+:ʅ
+»
+,

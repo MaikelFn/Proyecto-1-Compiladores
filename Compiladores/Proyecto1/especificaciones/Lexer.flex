@@ -82,6 +82,76 @@ Lit_Bool = "true"|"false"
 "read"      { return "READ"; }
 "write"     { return "WRITE"; }
 
+/* ==========================================
+    3.3 OPERADORES ARITMETICOS
+    ========================================== */
+
+"+"     { return "SUMA"; }
+"-"     { return "RESTA"; }
+"*"     { return "MULTIPLICACION"; }
+"/"     { return "DIVISION"; }
+"//"    { return "DIVISION_ENTERA"; }
+
+"mod"   { return "MODULO"; }
+"pot"   { return "POTENCIA"; }
+
+"++"    { return "INCREMENTO"; }
+"--"    { return "DECREMENTO"; }
+
+/* ==========================================
+    3.4 OPERADORES RELACIONALES
+    ========================================== */
+
+"<"     { return "MENOR"; }
+"<="    { return "MENOR_IGUAL"; }
+
+">"     { return "MAYOR"; }
+">="    { return "MAYOR_IGUAL"; }
+
+"=="    { return "IGUAL"; }
+"!="    { return "DIFERENTE"; }
+
+/* ==========================================
+    3.5 OPERADORES LOGICOS
+    ========================================== */
+
+"λ"     { return "AND"; }
+"θ"     { return "OR"; }
+"Σ"     { return "NOT"; }
+
+/* ==========================================
+    3.6 OPERADOR DE ASIGNACION
+    ========================================== */
+
+"Ͱ"     { return "ASIGNACION"; }
+
+/* ==========================================
+   3.7 DELIMITADORES Y SIMBOLOS
+   ========================================== */
+
+/* Bloques de codigo */
+
+"¿:"    { return "BLOQUE_INI"; }
+":?"    { return "BLOQUE_FIN"; }
+
+/* Parentesis */
+
+"є:"    { return "PAR_INI"; }
+":э"    { return "PAR_FIN"; }
+
+/* Corchetes */
+
+"ʃ:"    { return "COR_INI"; }
+":ʅ"    { return "COR_FIN"; }
+
+/* Final de expresion */
+
+"»"     { return "FIN_EXPR"; }
+
+/* Separador de parametros y argumentos */
+
+","     { return "COMA"; }
+
 {Lit_Bool} {
     return "LIT_BOOL";
 }
