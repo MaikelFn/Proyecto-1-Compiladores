@@ -1,24 +1,36 @@
+
 import java.io.FileReader;
+import java.io.IOException;
 
 public class MainPrueba {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 
-        if (args.length < 1) {
-            System.out.println("Uso: java MainPrueba <archivo>");
-            return;
+        try {
+            // Leer el archivo fuente.
+            FileReader archivo = new FileReader("pruebas/Prueba.txt");
+
+            // Crear el analizador léxico.
+            Lexer lexer = new Lexer(archivo);
+
+            String token;
+
+            // Obtener los tokens hasta llegar al final.
+            while ((token = lexer.yylex()) != null) {
+
+                System.out.println(
+                    "Token: " + token
+                    + " | Lexema: " + lexer.yytext()
+                    + " | Linea: " + lexer.getLinea()
+                );
+            }
+
+            archivo.close();
+
+        } catch (IOException e) {
+            System.out.println(
+                "Error al leer el archivo: " + e.getMessage()
+            );
         }
-
-        LexerIntegracion lexer =
-            new LexerIntegracion(new FileReader(args[0]));
-
-        ParserIntegracion parser =
-            new ParserIntegracion(lexer);
-
-        Integer resultado =
-            (Integer) parser.parse().value;
-
-        System.out.println("Analisis exitoso");
-        System.out.println("Resultado: " + resultado);
     }
 }
