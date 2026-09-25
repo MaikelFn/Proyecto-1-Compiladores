@@ -11,31 +11,17 @@ public class MainPrueba {
                 "pruebas/Prueba.txt",
                 StandardCharsets.UTF_8)) {
 
-            // Crear el analizador lexico.
+            // Crear el analizador lexico
             Lexer lexer = new Lexer(archivo);
 
             String token;
 
-            // Recorrer todos los tokens del archivo.
+            // Recorrer todos los tokens del archivo
             while ((token = lexer.yylex()) != null) {
 
-                String lexema = lexer.yytext();
-
-                // Obtener el valor Unicode de cada caracter.
-                StringBuilder unicode = new StringBuilder();
-
-                lexema.codePoints().forEach(c ->
-                    unicode.append(
-                        String.format("U+%04X ", c)
-                    )
-                );
-
-                // Mostrar la informacion del token.
                 System.out.println(
                     "Token: " + token
-                    + " | Lexema: " + lexema
-                    + " | Unicode: " + unicode
-                    + " | Linea: " + lexer.getLinea()
+                    + " | Lexema: " + lexer.yytext()
                 );
             }
 
