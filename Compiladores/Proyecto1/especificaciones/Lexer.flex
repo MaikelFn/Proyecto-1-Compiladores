@@ -18,16 +18,8 @@
 %xstate COMENTARIO_MULTI
 
 %{
-    /*
-     * Guarda la linea donde inicia
-     * un comentario multilinea.
-     */
     private int lineaInicioComentario;
 
-    /*
-     * Devuelve la linea actual.
-     * JFlex empieza a contar desde 0.
-     */
     public int getLinea() {
         return yyline + 1;
     }
@@ -58,7 +50,9 @@ Id = {Letra}{Caracter}*
    2.2 LITERALES ENTEROS
    ========================================== */
 
-Lit_Int = {Digito}+
+Lit_Int = 0|{Digito_No_Cero}{Digito}*
+
+Int_Cero_Inicial = 0{Digito}+
 
 
 /* ==========================================
@@ -73,64 +67,71 @@ Lit_Float = {Parte_Entera}"."{Parte_Decimal}
 
 
 /* ==========================================
-   2.4 LITERALES BOOLEANOS
+   2.4 FLOTANTES INVALIDOS
+   ========================================== */
+
+Float_Sin_Decimal = {Parte_Entera}"."
+
+Float_Sin_Entera = "."{Digito}+
+
+Float_Entera_Invalida = 0{Digito}+"."{Digito}+
+
+Float_Decimal_Invalida = {Parte_Entera}"."{Digito}*"0"
+
+
+/* ==========================================
+   2.5 LITERALES BOOLEANOS
    ========================================== */
 
 Lit_Bool = "true"|"false"
 
 
 /* ==========================================
-   2.5 CARACTERES PERMITIDOS EN CHAR Y STRING
+   2.6 CARACTERES PERMITIDOS EN CHAR Y STRING
    ========================================== */
 
 Caracter_String = [^\"'»¿?є:эʃʅͰλθΣ|¡!\r\n]
 
 
 /* ==========================================
-   2.6 LITERAL CHAR
+   2.7 LITERAL CHAR
    ========================================== */
 
-/*
- * Char valido:
- * exactamente un caracter entre comillas simples.
- */
-
 Lit_Char = "'" {Caracter_String} "'"
-
-
-/*
- * Char invalido:
- * cero o varios caracteres entre comillas simples.
- *
- * La regla Lit_Char aparece antes en las reglas
- * lexicas, por lo que 'a' se reconoce correctamente.
- *
- * Ejemplos invalidos:
- * ''
- * 'ab'
- * 'Hola'
- */
 
 Lit_Char_Invalido = "'" {Caracter_String}* "'"
 
 
 /* ==========================================
-   2.7 LITERAL STRING
+   2.8 LITERAL STRING
    ========================================== */
-
-/*
- * Un string utiliza comillas dobles.
- * Puede contener cero o mas caracteres.
- */
 
 Lit_String = "\"" {Caracter_String}* "\""
 
 
 /* ==========================================
-   2.8 COMENTARIOS
+   2.9 COMENTARIOS
    ========================================== */
 
 Comentario_Linea = \|[^\r\n]*
+
+
+/* ==========================================
+   2.10 LITERALES SIN CERRAR
+   ========================================== */
+
+String_Sin_Cerrar = "\"" [^\"\r\n]*
+
+Char_Sin_Cerrar = "'" [^'\r\n]*
+
+
+/* ==========================================
+   2.11 COMILLAS MEZCLADAS
+   ========================================== */
+
+Char_Comillas_Mezcladas = "'" [^\"\r\n]* "\""
+
+String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
 
 
 %%
@@ -353,47 +354,77 @@ Comentario_Linea = \|[^\r\n]*
 
 
 /* ==========================================
-   3.8 LITERALES
+   3.8 LITERALES VALIDOS
    ========================================== */
 
 {Lit_Bool} {
     return "LIT_BOOL";
 }
 
-
-/* CHAR VALIDO */
-
 {Lit_Char} {
     return "LIT_CHAR";
 }
 
-
-/* CHAR INVALIDO */
-
-{Lit_Char_Invalido} {
-    System.out.println(
-        "Error lexico en linea " + (yyline + 1)
-        + ": literal char invalido " + yytext()
-        + ". Un char debe contener exactamente un caracter."
-    );
-}
-
-
-/* STRING */
-
 {Lit_String} {
     return "LIT_STRING";
 }
-
-
-/* FLOAT */
 
 {Lit_Float} {
     return "LIT_FLOAT";
 }
 
 
-/* ENTERO */
+/* ==========================================
+   3.9 ERRORES DE FLOTANTES
+   ========================================== */
+
+{Float_Entera_Invalida} {
+    System.out.println(
+        "Error lexico en linea " + (yyline + 1)
+        + ": parte entera invalida en literal flotante "
+        + yytext()
+        + ". No se permiten ceros a la izquierda."
+    );
+}
+
+{Float_Decimal_Invalida} {
+    System.out.println(
+        "Error lexico en linea " + (yyline + 1)
+        + ": parte decimal invalida en literal flotante "
+        + yytext()
+        + ". La parte decimal debe terminar en un digito distinto de cero."
+    );
+}
+
+{Float_Sin_Decimal} {
+    System.out.println(
+        "Error lexico en linea " + (yyline + 1)
+        + ": literal flotante sin parte decimal "
+        + yytext()
+    );
+}
+
+{Float_Sin_Entera} {
+    System.out.println(
+        "Error lexico en linea " + (yyline + 1)
+        + ": literal flotante sin parte entera "
+        + yytext()
+    );
+}
+
+
+/* ==========================================
+   3.10 ERRORES DE ENTEROS
+   ========================================== */
+
+{Int_Cero_Inicial} {
+    System.out.println(
+        "Error lexico en linea " + (yyline + 1)
+        + ": literal entero invalido "
+        + yytext()
+        + ". No se permiten ceros a la izquierda."
+    );
+}
 
 {Lit_Int} {
     return "LIT_INT";
@@ -401,7 +432,64 @@ Comentario_Linea = \|[^\r\n]*
 
 
 /* ==========================================
-   3.9 IDENTIFICADORES
+   3.11 CHAR INVALIDO
+   ========================================== */
+
+{Lit_Char_Invalido} {
+    System.out.println(
+        "Error lexico en linea " + (yyline + 1)
+        + ": literal char invalido "
+        + yytext()
+        + ". Un char debe contener exactamente un caracter."
+    );
+}
+
+
+/* ==========================================
+   3.12 COMILLAS MEZCLADAS
+   ========================================== */
+
+{Char_Comillas_Mezcladas} {
+    System.out.println(
+        "Error lexico en linea " + (yyline + 1)
+        + ": comillas mezcladas en literal "
+        + yytext()
+    );
+}
+
+{String_Comillas_Mezcladas} {
+    System.out.println(
+        "Error lexico en linea " + (yyline + 1)
+        + ": comillas mezcladas en literal "
+        + yytext()
+    );
+}
+
+
+/* ==========================================
+   3.13 STRING Y CHAR SIN CERRAR
+   ========================================== */
+
+{String_Sin_Cerrar} {
+    System.out.println(
+        "Error lexico en linea " + (yyline + 1)
+        + ": string sin cerrar "
+        + yytext()
+    );
+}
+
+
+{Char_Sin_Cerrar} {
+    System.out.println(
+        "Error lexico en linea " + (yyline + 1)
+        + ": char sin cerrar "
+        + yytext()
+    );
+}
+
+
+/* ==========================================
+   3.14 IDENTIFICADORES
    ========================================== */
 
 {Id} {
@@ -410,51 +498,34 @@ Comentario_Linea = \|[^\r\n]*
 
 
 /* ==========================================
-   3.10 COMENTARIOS
+   3.15 COMENTARIOS
    ========================================== */
-
-
-/* Comentario de una linea */
 
 {Comentario_Linea} {
     /* Ignorar */
 }
-
-
-/* Inicio del comentario multilinea */
 
 "¡" {
     lineaInicioComentario = yyline + 1;
     yybegin(COMENTARIO_MULTI);
 }
 
-
-/* Cierre del comentario multilinea */
-
 <COMENTARIO_MULTI> "!" {
     yybegin(YYINITIAL);
 }
-
-
-/* Contenido del comentario */
 
 <COMENTARIO_MULTI> [^!\r\n]+ {
     /* Ignorar */
 }
 
-
-/* Saltos de linea dentro del comentario */
-
 <COMENTARIO_MULTI> \r\n|\r|\n {
     /* Ignorar */
 }
 
-
-/* Comentario multilinea sin cerrar */
-
 <COMENTARIO_MULTI> <<EOF>> {
     System.out.println(
-        "Error lexico en linea " + lineaInicioComentario
+        "Error lexico en linea "
+        + lineaInicioComentario
         + ": comentario multilinea no fue cerrado con !"
     );
 
@@ -467,17 +538,19 @@ Comentario_Linea = \|[^\r\n]*
    ========================================== */
 
 [ \t\r\n]+ {
-    /* Ignorar espacios en blanco */
+    /* Ignorar */
 }
 
 
 /* ==========================================
-   5. ERRORES LEXICOS
+   5. ERROR LEXICO GENERAL
    ========================================== */
 
 [^] {
     System.out.println(
         "Error lexico en linea " + (yyline + 1)
-        + ": caracter no reconocido '" + yytext() + "'"
+        + ": caracter no reconocido '"
+        + yytext()
+        + "'"
     );
 }
