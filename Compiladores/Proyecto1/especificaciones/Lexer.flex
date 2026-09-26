@@ -12,9 +12,25 @@
 %public
 %class Lexer
 %unicode
+%line
 %type String
 
+%xstate COMENTARIO_MULTI
+
 %{
+    /*
+     * Guarda la linea donde inicia
+     * un comentario multilinea.
+     */
+    private int lineaInicioComentario;
+
+    /*
+     * Devuelve la linea actual.
+     * JFlex empieza a contar desde 0.
+     */
+    public int getLinea() {
+        return yyline + 1;
+    }
 %}
 
 
@@ -67,14 +83,6 @@ Lit_Bool = "true"|"false"
    2.5 CARACTERES PERMITIDOS EN CHAR Y STRING
    ========================================== */
 
-/*
- * No permite:
- * - comillas dobles
- * - comillas simples
- * - simbolos especiales reservados
- * - saltos de linea
- */
-
 Caracter_String = [^\"'»¿?є:эʃʅͰλθΣ|¡!\r\n]
 
 
@@ -83,16 +91,27 @@ Caracter_String = [^\"'»¿?є:эʃʅͰλθΣ|¡!\r\n]
    ========================================== */
 
 /*
- * Un char contiene exactamente un caracter
- * entre comillas simples.
- *
- * Ejemplos:
- * 'a'
- * '5'
- * 'Z'
+ * Char valido:
+ * exactamente un caracter entre comillas simples.
  */
 
 Lit_Char = "'" {Caracter_String} "'"
+
+
+/*
+ * Char invalido:
+ * cero o varios caracteres entre comillas simples.
+ *
+ * La regla Lit_Char aparece antes en las reglas
+ * lexicas, por lo que 'a' se reconoce correctamente.
+ *
+ * Ejemplos invalidos:
+ * ''
+ * 'ab'
+ * 'Hola'
+ */
+
+Lit_Char_Invalido = "'" {Caracter_String}* "'"
 
 
 /* ==========================================
@@ -102,15 +121,16 @@ Lit_Char = "'" {Caracter_String} "'"
 /*
  * Un string utiliza comillas dobles.
  * Puede contener cero o mas caracteres.
- *
- * Ejemplos:
- * ""
- * "a"
- * "Hola"
- * "12345"
  */
 
 Lit_String = "\"" {Caracter_String}* "\""
+
+
+/* ==========================================
+   2.8 COMENTARIOS
+   ========================================== */
+
+Comentario_Linea = \|[^\r\n]*
 
 
 %%
@@ -299,9 +319,6 @@ Lit_String = "\"" {Caracter_String}* "\""
    3.7 DELIMITADORES Y SIMBOLOS
    ========================================== */
 
-
-/* Bloque de codigo */
-
 "¿:" {
     return "BLOQUE_INI";
 }
@@ -309,9 +326,6 @@ Lit_String = "\"" {Caracter_String}* "\""
 ":?" {
     return "BLOQUE_FIN";
 }
-
-
-/* Parentesis especiales */
 
 "є:" {
     return "PAR_INI";
@@ -321,9 +335,6 @@ Lit_String = "\"" {Caracter_String}* "\""
     return "PAR_FIN";
 }
 
-
-/* Corchetes especiales */
-
 "ʃ:" {
     return "COR_INI";
 }
@@ -332,15 +343,9 @@ Lit_String = "\"" {Caracter_String}* "\""
     return "COR_FIN";
 }
 
-
-/* Final de expresion */
-
 "»" {
     return "FIN_EXPR";
 }
-
-
-/* Coma */
 
 "," {
     return "COMA";
@@ -351,46 +356,44 @@ Lit_String = "\"" {Caracter_String}* "\""
    3.8 LITERALES
    ========================================== */
 
-/*
- * IMPORTANTE:
- * Los literales booleanos deben aparecer
- * antes del identificador, ya que true y
- * false tambien cumplen con la forma de Id.
- */
-
 {Lit_Bool} {
     return "LIT_BOOL";
 }
 
 
-/*
- * CHAR:
- * exactamente un caracter entre comillas simples.
- */
+/* CHAR VALIDO */
 
 {Lit_Char} {
     return "LIT_CHAR";
 }
 
 
-/*
- * STRING:
- * cero o mas caracteres entre comillas dobles.
- */
+/* CHAR INVALIDO */
+
+{Lit_Char_Invalido} {
+    System.out.println(
+        "Error lexico en linea " + (yyline + 1)
+        + ": literal char invalido " + yytext()
+        + ". Un char debe contener exactamente un caracter."
+    );
+}
+
+
+/* STRING */
 
 {Lit_String} {
     return "LIT_STRING";
 }
 
 
-/*
- * FLOAT debe evaluarse antes que INT.
- */
+/* FLOAT */
 
 {Lit_Float} {
     return "LIT_FLOAT";
 }
 
+
+/* ENTERO */
 
 {Lit_Int} {
     return "LIT_INT";
@@ -407,11 +410,64 @@ Lit_String = "\"" {Caracter_String}* "\""
 
 
 /* ==========================================
+   3.10 COMENTARIOS
+   ========================================== */
+
+
+/* Comentario de una linea */
+
+{Comentario_Linea} {
+    /* Ignorar */
+}
+
+
+/* Inicio del comentario multilinea */
+
+"¡" {
+    lineaInicioComentario = yyline + 1;
+    yybegin(COMENTARIO_MULTI);
+}
+
+
+/* Cierre del comentario multilinea */
+
+<COMENTARIO_MULTI> "!" {
+    yybegin(YYINITIAL);
+}
+
+
+/* Contenido del comentario */
+
+<COMENTARIO_MULTI> [^!\r\n]+ {
+    /* Ignorar */
+}
+
+
+/* Saltos de linea dentro del comentario */
+
+<COMENTARIO_MULTI> \r\n|\r|\n {
+    /* Ignorar */
+}
+
+
+/* Comentario multilinea sin cerrar */
+
+<COMENTARIO_MULTI> <<EOF>> {
+    System.out.println(
+        "Error lexico en linea " + lineaInicioComentario
+        + ": comentario multilinea no fue cerrado con !"
+    );
+
+    return null;
+}
+
+
+/* ==========================================
    4. ESPACIOS EN BLANCO
    ========================================== */
 
 [ \t\r\n]+ {
-    /* Se ignoran los espacios en blanco */
+    /* Ignorar espacios en blanco */
 }
 
 
@@ -421,6 +477,7 @@ Lit_String = "\"" {Caracter_String}* "\""
 
 [^] {
     System.out.println(
-        "Error lexico: caracter no reconocido '" + yytext() + "'"
+        "Error lexico en linea " + (yyline + 1)
+        + ": caracter no reconocido '" + yytext() + "'"
     );
 }

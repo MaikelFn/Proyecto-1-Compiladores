@@ -1,14 +1,13 @@
-'a'
-'Z'
-'5'
+val int edad Ͱ 20 »
 
-"Hola"
-"a"
-"12345"
-""
+'abc'
 
-'ab'
-'Hola'
+''
 
-'a"
-"Hola'
+@
+
+#
+
+¡
+este comentario multilinea
+nunca se cierra
