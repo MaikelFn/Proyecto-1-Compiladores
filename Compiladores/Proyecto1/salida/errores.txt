@@ -1,5 +1,0 @@
-Error lexico en linea 3: literal char invalido 'abc'. Un char debe contener exactamente un caracter.
-Error lexico en linea 5: literal char invalido ''. Un char debe contener exactamente un caracter.
-Error lexico en linea 7: caracter no reconocido '@'
-Error lexico en linea 9: caracter no reconocido '#'
-Error lexico en linea 11: comentario multilinea no fue cerrado con !

@@ -1,13 +1,352 @@
-val int edad Ͱ 20 »
+| ==========================================
+| ARCHIVO GRANDE DE PRUEBA
+| PROYECTO 1 - COMPILADORES
+| ==========================================
 
-'abc'
+| Variables globales
 
-''
+val int contadorGlobal Ͱ 0 »
+val int limiteGlobal Ͱ 25 »
+val float temperaturaGlobal Ͱ 23.5 »
+val float voltajeGlobal Ͱ 3.3 »
+val bool sistemaActivo Ͱ true »
+val bool modoSeguro Ͱ false »
+val char estadoGlobal Ͱ 'A' »
+val string nombreSistema Ͱ "ChipControl" »
 
-@
+| Arreglos globales
 
-#
+val int numeros ʃ:5:ʅ »
+val int valores ʃ:5:ʅ Ͱ ¿:1,2,3,4,5:?
+val float voltajes ʃ:4:ʅ Ͱ ¿:1.5,2.5,3.5,4.5:?
 
 ¡
-este comentario multilinea
-nunca se cierra
+Comentario de varias lineas
+utilizado para probar el lexer
+antes de comenzar las funciones
+!
+
+| ==========================================
+| FUNCION SIN PARAMETROS
+| ==========================================
+
+int obtenerLimite є::э ¿:
+
+    val int resultado Ͱ 25 »
+
+    write є:resultado:э »
+
+    return resultado »
+
+:?
+
+| ==========================================
+| FUNCION CON UN PARAMETRO
+| ==========================================
+
+int duplicar є:int numero:э ¿:
+
+    val int resultado Ͱ numero * 2 »
+
+    return resultado »
+
+:?
+
+| ==========================================
+| FUNCION CON VARIOS PARAMETROS
+| ==========================================
+
+int sumar є:int numeroA,int numeroB:э ¿:
+
+    val int resultado Ͱ numeroA + numeroB »
+
+    return resultado »
+
+:?
+
+float calcularVoltaje є:float resistencia,float corriente:э ¿:
+
+    val float resultado Ͱ resistencia * corriente »
+
+    return resultado »
+
+:?
+
+bool compararValores є:int valorA,int valorB:э ¿:
+
+    val bool resultado Ͱ ʃ:valorA:ʅ < ʃ:valorB:ʅ »
+
+    return resultado »
+
+:?
+
+| ==========================================
+| FUNCION CON OPERACIONES ARITMETICAS
+| ==========================================
+
+int operaciones є:int numeroA,int numeroB:э ¿:
+
+    val int suma Ͱ numeroA + numeroB »
+    val int resta Ͱ numeroA - numeroB »
+    val int multiplicacion Ͱ numeroA * numeroB »
+    val int division Ͱ numeroA // numeroB »
+    val int residuo Ͱ numeroA mod numeroB »
+    val int potencia Ͱ numeroA pot numeroB »
+
+    suma++ »
+    resta-- »
+
+    write є:suma:э »
+    write є:resta:э »
+    write є:multiplicacion:э »
+    write є:division:э »
+    write є:residuo:э »
+    write є:potencia:э »
+
+    return suma »
+
+:?
+
+| ==========================================
+| FUNCION CON IF ELIF ELSE
+| ==========================================
+
+int clasificar є:int numero:э ¿:
+
+    val int resultado Ͱ 0 »
+
+    if є:ʃ:numero:ʅ < ʃ:10:ʅ:э ¿:
+
+        resultado Ͱ 1 »
+        write є:"Menor":э »
+
+    :?
+
+    elif є:ʃ:numero:ʅ == ʃ:10:ʅ:э ¿:
+
+        resultado Ͱ 2 »
+        write є:"Igual":э »
+
+    :?
+
+    else ¿:
+
+        resultado Ͱ 3 »
+        write є:"Mayor":э »
+
+    :?
+
+    return resultado »
+
+:?
+
+| ==========================================
+| FUNCION CON WHILE
+| ==========================================
+
+int contar є:int limite:э ¿:
+
+    val int contador Ͱ 0 »
+
+    while є:ʃ:contador:ʅ < ʃ:limite:ʅ:э ¿:
+
+        write є:contador:э »
+
+        contador++ »
+
+    :?
+
+    return contador »
+
+:?
+
+| ==========================================
+| FUNCION CON FOR
+| ==========================================
+
+int recorrer є:int limite:э ¿:
+
+    val int acumulador Ͱ 0 »
+
+    for є:val int i Ͱ 0 » ʃ:i:ʅ < ʃ:limite:ʅ » i++ :э ¿:
+
+        acumulador Ͱ acumulador + i »
+
+        write є:i:э »
+
+    :?
+
+    return acumulador »
+
+:?
+
+| ==========================================
+| FUNCION CON ARREGLOS
+| ==========================================
+
+int trabajarArreglo є::э ¿:
+
+    val int datos ʃ:5:ʅ Ͱ ¿:10,20,30,40,50:?
+
+    val int primero Ͱ datos ʃ:0:ʅ »
+    val int segundo Ͱ datos ʃ:1:ʅ »
+
+    datos ʃ:2:ʅ Ͱ primero + segundo »
+
+    write є:primero:э »
+    write є:segundo:э »
+
+    return datos ʃ:2:ʅ »
+
+:?
+
+| ==========================================
+| FUNCION CON BOOLEANOS
+| ==========================================
+
+bool validar є:int edad,bool activo:э ¿:
+
+    val bool mayor Ͱ ʃ:edad:ʅ >= ʃ:18:ʅ »
+
+    val bool resultado Ͱ є:mayor:э λ є:activo:э »
+
+    return resultado »
+
+:?
+
+| ==========================================
+| FUNCION CON NEGACION LOGICA
+| ==========================================
+
+bool invertir є:bool estado:э ¿:
+
+    val bool resultado Ͱ Σ є:estado:э »
+
+    return resultado »
+
+:?
+
+| ==========================================
+| FUNCION CON READ Y WRITE
+| ==========================================
+
+int solicitarNumero є::э ¿:
+
+    val int numero »
+
+    write є:"IngreseNumero":э »
+
+    read є:numero:э »
+
+    write є:numero:э »
+
+    return numero »
+
+:?
+
+| ==========================================
+| FUNCION CON BREAK
+| ==========================================
+
+int buscarLimite є:int limite:э ¿:
+
+    val int contador Ͱ 0 »
+
+    while є:ʃ:contador:ʅ < ʃ:100:ʅ:э ¿:
+
+        contador++ »
+
+        if є:ʃ:contador:ʅ == ʃ:limite:ʅ:э ¿:
+
+            break »
+
+        :?
+
+    :?
+
+    return contador »
+
+:?
+
+| ==========================================
+| FUNCION CON STRINGS CHAR Y FLOAT
+| ==========================================
+
+float sensores є:float sensorA,float sensorB:э ¿:
+
+    val string nombre Ͱ "Sensores" »
+    val char estado Ͱ 'A' »
+
+    val float promedio Ͱ sensorA + sensorB / 2.5 »
+
+    write є:nombre:э »
+    write є:estado:э »
+    write є:promedio:э »
+
+    return promedio »
+
+:?
+
+| ==========================================
+| PROCEDIMIENTO PRINCIPAL
+| SIEMPRE DEBE ESTAR AL FINAL
+| ==========================================
+
+void principal є::э ¿:
+
+    val int numeroA Ͱ 5 »
+    val int numeroB Ͱ 3 »
+    val int resultado »
+
+    val float resistencia Ͱ 2.5 »
+    val float corriente Ͱ 1.5 »
+    val float voltaje »
+
+    val bool activo Ͱ true »
+    val bool validacion »
+
+    val char estado Ͱ 'A' »
+    val string mensaje Ͱ "InicioSistema" »
+
+    write є:mensaje:э »
+    write є:estado:э »
+
+    resultado Ͱ sumar є:numeroA,numeroB:э »
+
+    write є:resultado:э »
+
+    resultado Ͱ duplicar є:resultado:э »
+
+    write є:resultado:э »
+
+    voltaje Ͱ calcularVoltaje є:resistencia,corriente:э »
+
+    write є:voltaje:э »
+
+    validacion Ͱ compararValores є:numeroA,numeroB:э »
+
+    write є:validacion:э »
+
+    operaciones є:numeroA,numeroB:э »
+
+    clasificar є:resultado:э »
+
+    contar є:5:э »
+
+    recorrer є:10:э »
+
+    trabajarArreglo є::э »
+
+    validar є:20,activo:э »
+
+    invertir є:activo:э »
+
+    solicitarNumero є::э »
+
+    buscarLimite є:15:э »
+
+    sensores є:2.5,3.5:э »
+
+    | Ultima prueba antes de finalizar
+
+:?
