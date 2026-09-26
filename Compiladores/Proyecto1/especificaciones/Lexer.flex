@@ -20,8 +20,23 @@
 %{
     private int lineaInicioComentario;
 
+    private java.util.Queue<String> erroresPendientes =
+        new java.util.ArrayDeque<>();
+
     public int getLinea() {
         return yyline + 1;
+    }
+
+    private void registrarError(String mensaje) {
+        erroresPendientes.add(mensaje);
+    }
+
+    public boolean hayErroresPendientes() {
+        return !erroresPendientes.isEmpty();
+    }
+
+    public String obtenerSiguienteError() {
+        return erroresPendientes.poll();
     }
 %}
 
@@ -110,7 +125,7 @@ Lit_String = "\"" {Caracter_String}* "\""
 
 
 /* ==========================================
-   2.9 COMENTARIOS
+   2.9 COMENTARIO DE UNA LINEA
    ========================================== */
 
 Comentario_Linea = \|[^\r\n]*
@@ -379,7 +394,7 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    ========================================== */
 
 {Float_Entera_Invalida} {
-    System.out.println(
+    registrarError(
         "Error lexico en linea " + (yyline + 1)
         + ": parte entera invalida en literal flotante "
         + yytext()
@@ -388,7 +403,7 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
 }
 
 {Float_Decimal_Invalida} {
-    System.out.println(
+    registrarError(
         "Error lexico en linea " + (yyline + 1)
         + ": parte decimal invalida en literal flotante "
         + yytext()
@@ -397,7 +412,7 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
 }
 
 {Float_Sin_Decimal} {
-    System.out.println(
+    registrarError(
         "Error lexico en linea " + (yyline + 1)
         + ": literal flotante sin parte decimal "
         + yytext()
@@ -405,7 +420,7 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
 }
 
 {Float_Sin_Entera} {
-    System.out.println(
+    registrarError(
         "Error lexico en linea " + (yyline + 1)
         + ": literal flotante sin parte entera "
         + yytext()
@@ -418,7 +433,7 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    ========================================== */
 
 {Int_Cero_Inicial} {
-    System.out.println(
+    registrarError(
         "Error lexico en linea " + (yyline + 1)
         + ": literal entero invalido "
         + yytext()
@@ -436,7 +451,7 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    ========================================== */
 
 {Lit_Char_Invalido} {
-    System.out.println(
+    registrarError(
         "Error lexico en linea " + (yyline + 1)
         + ": literal char invalido "
         + yytext()
@@ -450,7 +465,7 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    ========================================== */
 
 {Char_Comillas_Mezcladas} {
-    System.out.println(
+    registrarError(
         "Error lexico en linea " + (yyline + 1)
         + ": comillas mezcladas en literal "
         + yytext()
@@ -458,7 +473,7 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
 }
 
 {String_Comillas_Mezcladas} {
-    System.out.println(
+    registrarError(
         "Error lexico en linea " + (yyline + 1)
         + ": comillas mezcladas en literal "
         + yytext()
@@ -471,16 +486,15 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    ========================================== */
 
 {String_Sin_Cerrar} {
-    System.out.println(
+    registrarError(
         "Error lexico en linea " + (yyline + 1)
         + ": string sin cerrar "
         + yytext()
     );
 }
 
-
 {Char_Sin_Cerrar} {
-    System.out.println(
+    registrarError(
         "Error lexico en linea " + (yyline + 1)
         + ": char sin cerrar "
         + yytext()
@@ -523,7 +537,8 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
 }
 
 <COMENTARIO_MULTI> <<EOF>> {
-    System.out.println(
+
+    registrarError(
         "Error lexico en linea "
         + lineaInicioComentario
         + ": comentario multilinea no fue cerrado con !"
@@ -547,7 +562,7 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    ========================================== */
 
 [^] {
-    System.out.println(
+    registrarError(
         "Error lexico en linea " + (yyline + 1)
         + ": caracter no reconocido '"
         + yytext()

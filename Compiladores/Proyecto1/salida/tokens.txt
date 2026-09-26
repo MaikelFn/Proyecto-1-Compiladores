@@ -1,0 +1,6 @@
+Token: VAL | Lexema: val | Linea: 1
+Token: INT | Lexema: int | Linea: 1
+Token: ID | Lexema: edad | Linea: 1
+Token: ASIGNACION | Lexema: Ͱ | Linea: 1
+Token: LIT_INT | Lexema: 20 | Linea: 1
+Token: FIN_EXPR | Lexema: » | Linea: 1
