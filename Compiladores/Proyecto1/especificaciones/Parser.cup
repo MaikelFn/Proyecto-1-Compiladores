@@ -1,0 +1,322 @@
+import java_cup.runtime.*;
+
+parser code {:
+    public void syntax_error(Symbol s) {
+        // Se maneja en report_error / report_fatal_error
+    }
+
+    public void report_error(String message, Object info) {
+        StringBuilder m = new StringBuilder();
+        m.append("Error sintactico");
+        if (info instanceof Symbol) {
+            Symbol sym = (Symbol) info;
+            if (sym.left >= 0) {
+                m.append(" en linea ").append(sym.left);
+            }
+        }
+        m.append(": ").append(message);
+        System.out.println(m.toString());
+    }
+
+    public void report_fatal_error(String message, Object info) {
+        report_error(message, info);
+    }
+:};
+
+/* ==========================================
+   TERMINALES (deben calzar con Lexer.flex)
+   ========================================== */
+
+terminal INT, FLOAT, BOOL, CHAR, STRING, VOID;
+terminal PRINCIPAL, IF, ELIF, ELSE, WHILE, FOR, RETURN, BREAK, VAL, READ, WRITE;
+terminal INCREMENTO, DECREMENTO, DIVISION_ENTERA, SUMA, RESTA, MULTIPLICACION, DIVISION, MODULO, POTENCIA;
+terminal MENOR_IGUAL, MAYOR_IGUAL, IGUAL, DIFERENTE, MENOR, MAYOR;
+terminal AND, OR, NOT;
+terminal ASIGNACION;
+terminal BLOQUE_INI, BLOQUE_FIN, PAR_INI, PAR_FIN, COR_INI, COR_FIN, FIN_EXPR, COMA;
+terminal LIT_BOOL, LIT_CHAR, LIT_STRING;
+terminal LIT_FLOAT, LIT_INT;
+terminal ID;
+
+/* ==========================================
+   NO TERMINALES
+   ========================================== */
+
+non terminal PROGRAMA;
+non terminal LISTA_ELEMENTOS, ELEMENTO_PROGRAMA;
+non terminal DECLARACION_GLOBAL;
+non terminal FUNCION_MAIN;
+non terminal DECLARACION_FUNCION;
+non terminal TIPO_RETORNO, TIPO;
+non terminal PARAMETROS, PARAMETRO;
+non terminal ARGUMENTOS, ARGUMENTO;
+non terminal LLAMADA_FUNCION;
+non terminal BLOQUE;
+non terminal LISTA_SENTENCIAS, SENTENCIA;
+
+non terminal DECLARACION_VAR_SIMPLE, DECLARACION_VAR_ASIGNADA;
+non terminal ARREGLO, ARREGLO_INT, ARREGLO_FLOAT;
+non terminal ASIGNACION_ARREGLO, ACCESO_ARREGLO;
+non terminal TAMANO_ARREGLO, LISTA_INT, LISTA_FLOAT, INDICE;
+non terminal ASIGNACION_VAR, EXPR_SIN_ASIGNACION;
+
+non terminal SENTENCIA_IF, SENTENCIA_IF_RESTO, SENTENCIA_ELIF_LISTA;
+non terminal SENTENCIA_WHILE, SENTENCIA_FOR;
+non terminal SENTENCIA_FOR_INIT, SENTENCIA_FOR_INCREMENTO, ASIGNACION_VAR_SIN_FIN;
+non terminal SENTENCIA_READ, SENTENCIA_WRITE, OPERANDO_WRITE;
+non terminal SENTENCIA_RETURN, SENTENCIA_BREAK;
+
+/* ==========================================
+   PRODUCCIONES
+   ========================================== */
+
+start with PROGRAMA;
+
+PROGRAMA ::=
+      FUNCION_MAIN
+    | LISTA_ELEMENTOS FUNCION_MAIN
+    ;
+
+LISTA_ELEMENTOS ::=
+      ELEMENTO_PROGRAMA
+    | ELEMENTO_PROGRAMA LISTA_ELEMENTOS
+    ;
+
+ELEMENTO_PROGRAMA ::=
+      DECLARACION_GLOBAL
+    | DECLARACION_FUNCION
+    ;
+
+/* ---- 21. Declaraciones globales ---- */
+DECLARACION_GLOBAL ::=
+      DECLARACION_VAR_SIMPLE
+    | DECLARACION_VAR_ASIGNADA
+    | ARREGLO
+    ;
+
+/* ---- 20. Función principal ---- */
+FUNCION_MAIN ::=
+      VOID PRINCIPAL PAR_INI PAR_FIN BLOQUE
+    ;
+
+/* ---- 4. Tipos ---- */
+TIPO ::=
+      INT
+    | FLOAT
+    | BOOL
+    | CHAR
+    | STRING
+    ;
+
+TIPO_RETORNO ::=
+      INT
+    | FLOAT
+    | CHAR
+    | BOOL
+    ;
+
+PARAMETRO ::=
+      TIPO ID
+    ;
+
+PARAMETROS ::=
+      PARAMETRO
+    | PARAMETRO COMA PARAMETROS
+    ;
+
+/* ---- 11. Funciones ---- */
+DECLARACION_FUNCION ::=
+      TIPO_RETORNO ID PAR_INI PAR_FIN BLOQUE
+    | TIPO_RETORNO ID PAR_INI PARAMETROS PAR_FIN BLOQUE
+    ;
+
+ARGUMENTO ::=
+      ID
+    | LIT_INT
+    | LIT_FLOAT
+    | LIT_BOOL
+    | LIT_STRING
+    ;
+
+ARGUMENTOS ::=
+      ARGUMENTO
+    | ARGUMENTO COMA ARGUMENTOS
+    ;
+
+LLAMADA_FUNCION ::=
+      ID PAR_INI PAR_FIN
+    | ID PAR_INI ARGUMENTOS PAR_FIN
+    ;
+
+/* ---- 19. Bloques y 18. Sentencias ---- */
+BLOQUE ::=
+      BLOQUE_INI LISTA_SENTENCIAS BLOQUE_FIN
+    ;
+
+LISTA_SENTENCIAS ::=
+      SENTENCIA
+    | SENTENCIA LISTA_SENTENCIAS
+    ;
+
+SENTENCIA ::=
+      DECLARACION_VAR_SIMPLE
+    | DECLARACION_VAR_ASIGNADA
+    | ASIGNACION_VAR
+    | ARREGLO
+    | ASIGNACION_ARREGLO
+    | EXPR_SIN_ASIGNACION
+    | SENTENCIA_RETURN
+    | SENTENCIA_BREAK
+    | SENTENCIA_READ
+    | SENTENCIA_WRITE
+    | SENTENCIA_IF
+    | SENTENCIA_WHILE
+    | SENTENCIA_FOR
+    ;
+
+/* ---- 10. Variables y asignaciones ---- */
+DECLARACION_VAR_SIMPLE ::=
+      VAL TIPO ID FIN_EXPR
+    ;
+
+DECLARACION_VAR_ASIGNADA ::=
+      VAL TIPO ID ASIGNACION ID FIN_EXPR
+    | VAL TIPO ID ASIGNACION LIT_INT FIN_EXPR
+    | VAL TIPO ID ASIGNACION LIT_FLOAT FIN_EXPR
+    | VAL TIPO ID ASIGNACION LIT_BOOL FIN_EXPR
+    | VAL TIPO ID ASIGNACION LIT_STRING FIN_EXPR
+    ;
+
+ASIGNACION_VAR ::=
+      ID ASIGNACION ID FIN_EXPR
+    | ID ASIGNACION LIT_INT FIN_EXPR
+    | ID ASIGNACION LIT_FLOAT FIN_EXPR
+    | ID ASIGNACION LIT_BOOL FIN_EXPR
+    ;
+
+ASIGNACION_VAR_SIN_FIN ::=
+      ID ASIGNACION ID
+    | ID ASIGNACION LIT_INT
+    ;
+
+EXPR_SIN_ASIGNACION ::=
+      ID FIN_EXPR
+    | LIT_INT FIN_EXPR
+    | LLAMADA_FUNCION FIN_EXPR
+    ;
+
+/* ---- 5. Arreglos ---- */
+LISTA_INT ::=
+      LIT_INT
+    | LIT_INT COMA LISTA_INT
+    ;
+
+LISTA_FLOAT ::=
+      LIT_FLOAT
+    | LIT_FLOAT COMA LISTA_FLOAT
+    ;
+
+TAMANO_ARREGLO ::=
+      LIT_INT
+    ;
+
+ARREGLO_INT ::=
+      VAL INT ID COR_INI TAMANO_ARREGLO COR_FIN FIN_EXPR
+    | VAL INT ID COR_INI TAMANO_ARREGLO COR_FIN ASIGNACION BLOQUE_INI LISTA_INT BLOQUE_FIN FIN_EXPR
+    ;
+
+ARREGLO_FLOAT ::=
+      VAL FLOAT ID COR_INI TAMANO_ARREGLO COR_FIN FIN_EXPR
+    | VAL FLOAT ID COR_INI TAMANO_ARREGLO COR_FIN ASIGNACION BLOQUE_INI LISTA_FLOAT BLOQUE_FIN FIN_EXPR
+    ;
+
+ARREGLO ::=
+      ARREGLO_INT
+    | ARREGLO_FLOAT
+    ;
+
+INDICE ::=
+      LIT_INT
+    ;
+
+ACCESO_ARREGLO ::=
+      ID COR_INI INDICE COR_FIN
+    ;
+
+ASIGNACION_ARREGLO ::=
+      ACCESO_ARREGLO ASIGNACION LIT_INT FIN_EXPR
+    | ACCESO_ARREGLO ASIGNACION LIT_FLOAT FIN_EXPR
+    | ACCESO_ARREGLO ASIGNACION ID FIN_EXPR
+    ;
+
+/* ---- 13. Entrada y salida ---- */
+SENTENCIA_READ ::=
+      READ PAR_INI ID PAR_FIN FIN_EXPR
+    ;
+
+OPERANDO_WRITE ::=
+      ID
+    | LIT_INT
+    | LIT_FLOAT
+    | LIT_BOOL
+    | LIT_STRING
+    ;
+
+SENTENCIA_WRITE ::=
+      WRITE PAR_INI OPERANDO_WRITE PAR_FIN FIN_EXPR
+    ;
+
+/* ---- 14. Return y break ---- */
+SENTENCIA_RETURN ::=
+      RETURN ID FIN_EXPR
+    | RETURN LIT_INT FIN_EXPR
+    | RETURN FIN_EXPR
+    ;
+
+SENTENCIA_BREAK ::=
+      BREAK FIN_EXPR
+    ;
+
+/* ---- 16. Estructura if-elif-else ---- */
+SENTENCIA_IF ::=
+      IF PAR_INI LIT_BOOL PAR_FIN BLOQUE SENTENCIA_IF_RESTO
+    | IF PAR_INI ID PAR_FIN BLOQUE SENTENCIA_IF_RESTO
+    ;
+
+SENTENCIA_IF_RESTO ::=
+      /* vacio */
+    | SENTENCIA_ELIF_LISTA
+    | ELSE BLOQUE
+    | SENTENCIA_ELIF_LISTA ELSE BLOQUE
+    ;
+
+SENTENCIA_ELIF_LISTA ::=
+      ELIF PAR_INI LIT_BOOL PAR_FIN BLOQUE
+    | ELIF PAR_INI ID PAR_FIN BLOQUE
+    | ELIF PAR_INI LIT_BOOL PAR_FIN BLOQUE SENTENCIA_ELIF_LISTA
+    | ELIF PAR_INI ID PAR_FIN BLOQUE SENTENCIA_ELIF_LISTA
+    ;
+
+/* ---- 17. Estructura while ---- */
+SENTENCIA_WHILE ::=
+      WHILE PAR_INI LIT_BOOL PAR_FIN BLOQUE
+    | WHILE PAR_INI ID PAR_FIN BLOQUE
+    ;
+
+/* ---- 15. Estructura for ---- */
+SENTENCIA_FOR_INIT ::=
+      DECLARACION_VAR_ASIGNADA
+    | ASIGNACION_VAR
+    ;
+
+SENTENCIA_FOR_INCREMENTO ::=
+      ID INCREMENTO
+    | ID DECREMENTO
+    | ASIGNACION_VAR_SIN_FIN
+    ;
+
+SENTENCIA_FOR ::=
+      FOR PAR_INI SENTENCIA_FOR_INIT LIT_BOOL FIN_EXPR SENTENCIA_FOR_INCREMENTO PAR_FIN BLOQUE
+    | FOR PAR_INI SENTENCIA_FOR_INIT ID FIN_EXPR SENTENCIA_FOR_INCREMENTO PAR_FIN BLOQUE
+    ;
+```[cite: 2, 3]
