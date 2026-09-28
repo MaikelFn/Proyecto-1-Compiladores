@@ -154,6 +154,15 @@ non terminal EXPR_RELACIONAL;
 
 
 /* ==========================================
+   EXPRESIONES LOGICAS
+   ========================================== */
+
+non terminal OPERANDO_LOGICO;
+non terminal EXPR_LOGICA;
+non terminal EXPR_NEGACION_LOGICA;
+
+
+/* ==========================================
    CONTROL DE FLUJO
    ========================================== */
 
@@ -420,6 +429,14 @@ EXPRESION ::=
     ;
 
 EXPRESION ::=
+      EXPR_LOGICA
+    ;
+
+EXPRESION ::=
+      EXPR_NEGACION_LOGICA
+    ;
+
+EXPRESION ::=
       LIT_BOOL
     ;
 
@@ -568,15 +585,10 @@ EXPR_ARITMETICA ::=
    13. EXPRESIONES RELACIONALES
    ========================================== */
 
-
-/* ---- Operando relacional ---- */
-
 OPERANDO_RELACIONAL ::=
       EXPR_ARITMETICA
     ;
 
-
-/* ---- Operando para igualdad ---- */
 
 OPERANDO_IGUALDAD ::=
       OPERANDO_RELACIONAL
@@ -627,7 +639,7 @@ EXPR_RELACIONAL ::=
     ;
 
 
-/* ---- Igualdad ---- */
+/* ---- Igual ---- */
 
 EXPR_RELACIONAL ::=
       COR_INI OPERANDO_IGUALDAD COR_FIN
@@ -646,7 +658,61 @@ EXPR_RELACIONAL ::=
 
 
 /* ==========================================
-   14. VARIABLES Y ASIGNACIONES
+   14. EXPRESIONES LOGICAS
+   ========================================== */
+
+OPERANDO_LOGICO ::=
+      LIT_BOOL
+    ;
+
+OPERANDO_LOGICO ::=
+      ID
+    ;
+
+OPERANDO_LOGICO ::=
+      EXPR_RELACIONAL
+    ;
+
+OPERANDO_LOGICO ::=
+      EXPR_NEGACION_LOGICA
+    ;
+
+OPERANDO_LOGICO ::=
+      LLAMADA_FUNCION
+    ;
+
+
+/* ---- AND ---- */
+
+EXPR_LOGICA ::=
+      PAR_INI OPERANDO_LOGICO PAR_FIN
+      AND
+      PAR_INI OPERANDO_LOGICO PAR_FIN
+    ;
+
+
+/* ---- OR ---- */
+
+EXPR_LOGICA ::=
+      PAR_INI OPERANDO_LOGICO PAR_FIN
+      OR
+      PAR_INI OPERANDO_LOGICO PAR_FIN
+    ;
+
+
+/* ---- NOT ---- */
+
+EXPR_NEGACION_LOGICA ::=
+      NOT PAR_INI OPERANDO_LOGICO PAR_FIN
+    ;
+
+EXPR_NEGACION_LOGICA ::=
+      NOT PAR_INI EXPR_LOGICA PAR_FIN
+    ;
+
+
+/* ==========================================
+   15. VARIABLES Y ASIGNACIONES
    ========================================== */
 
 DECLARACION_VAR_SIMPLE ::=
@@ -675,7 +741,7 @@ EXPR_SIN_ASIGNACION ::=
 
 
 /* ==========================================
-   15. ARREGLOS
+   16. ARREGLOS
    ========================================== */
 
 LISTA_INT ::=
@@ -731,7 +797,7 @@ ARREGLO ::=
 
 
 /* ==========================================
-   16. ACCESO A ARREGLOS
+   17. ACCESO A ARREGLOS
    ========================================== */
 
 INDICE ::=
@@ -745,7 +811,7 @@ ACCESO_ARREGLO ::=
 
 
 /* ==========================================
-   17. ASIGNACION DE ARREGLOS
+   18. ASIGNACION DE ARREGLOS
    ========================================== */
 
 ASIGNACION_ARREGLO ::=
@@ -754,7 +820,7 @@ ASIGNACION_ARREGLO ::=
 
 
 /* ==========================================
-   18. ENTRADA
+   19. ENTRADA
    ========================================== */
 
 SENTENCIA_READ ::=
@@ -763,7 +829,7 @@ SENTENCIA_READ ::=
 
 
 /* ==========================================
-   19. SALIDA
+   20. SALIDA
    ========================================== */
 
 OPERANDO_WRITE ::=
@@ -781,7 +847,7 @@ SENTENCIA_WRITE ::=
 
 
 /* ==========================================
-   20. RETURN Y BREAK
+   21. RETURN Y BREAK
    ========================================== */
 
 SENTENCIA_RETURN ::=
@@ -795,7 +861,7 @@ SENTENCIA_BREAK ::=
 
 
 /* ==========================================
-   21. IF - ELIF - ELSE
+   22. IF - ELIF - ELSE
    ========================================== */
 
 SENTENCIA_IF ::=
@@ -823,7 +889,7 @@ SENTENCIA_ELIF_LISTA ::=
 
 
 /* ==========================================
-   22. WHILE
+   23. WHILE
    ========================================== */
 
 SENTENCIA_WHILE ::=
@@ -832,7 +898,7 @@ SENTENCIA_WHILE ::=
 
 
 /* ==========================================
-   23. FOR
+   24. FOR
    ========================================== */
 
 SENTENCIA_FOR_INIT ::=
