@@ -44,7 +44,9 @@ terminal RETURN, BREAK, VAL, READ, WRITE;
 
 terminal INCREMENTO, DECREMENTO;
 terminal DIVISION_ENTERA;
-terminal SUMA, RESTA, MULTIPLICACION, DIVISION;
+
+terminal SUMA, RESTA;
+terminal MULTIPLICACION, DIVISION;
 terminal MODULO, POTENCIA;
 
 terminal MENOR_IGUAL, MAYOR_IGUAL;
@@ -140,6 +142,15 @@ non terminal EXPR_POTENCIA;
 non terminal EXPR_SUMA_RESTA;
 non terminal EXPR_MULT_DIV;
 non terminal EXPR_ARITMETICA;
+
+
+/* ==========================================
+   EXPRESIONES RELACIONALES
+   ========================================== */
+
+non terminal OPERANDO_RELACIONAL;
+non terminal OPERANDO_IGUALDAD;
+non terminal EXPR_RELACIONAL;
 
 
 /* ==========================================
@@ -405,6 +416,10 @@ EXPRESION ::=
     ;
 
 EXPRESION ::=
+      EXPR_RELACIONAL
+    ;
+
+EXPRESION ::=
       LIT_BOOL
     ;
 
@@ -550,7 +565,88 @@ EXPR_ARITMETICA ::=
 
 
 /* ==========================================
-   13. VARIABLES Y ASIGNACIONES
+   13. EXPRESIONES RELACIONALES
+   ========================================== */
+
+
+/* ---- Operando relacional ---- */
+
+OPERANDO_RELACIONAL ::=
+      EXPR_ARITMETICA
+    ;
+
+
+/* ---- Operando para igualdad ---- */
+
+OPERANDO_IGUALDAD ::=
+      OPERANDO_RELACIONAL
+    ;
+
+OPERANDO_IGUALDAD ::=
+      LIT_BOOL
+    ;
+
+OPERANDO_IGUALDAD ::=
+      LIT_CHAR
+    ;
+
+
+/* ---- Menor ---- */
+
+EXPR_RELACIONAL ::=
+      COR_INI OPERANDO_RELACIONAL COR_FIN
+      MENOR
+      COR_INI OPERANDO_RELACIONAL COR_FIN
+    ;
+
+
+/* ---- Menor o igual ---- */
+
+EXPR_RELACIONAL ::=
+      COR_INI OPERANDO_RELACIONAL COR_FIN
+      MENOR_IGUAL
+      COR_INI OPERANDO_RELACIONAL COR_FIN
+    ;
+
+
+/* ---- Mayor ---- */
+
+EXPR_RELACIONAL ::=
+      COR_INI OPERANDO_RELACIONAL COR_FIN
+      MAYOR
+      COR_INI OPERANDO_RELACIONAL COR_FIN
+    ;
+
+
+/* ---- Mayor o igual ---- */
+
+EXPR_RELACIONAL ::=
+      COR_INI OPERANDO_RELACIONAL COR_FIN
+      MAYOR_IGUAL
+      COR_INI OPERANDO_RELACIONAL COR_FIN
+    ;
+
+
+/* ---- Igualdad ---- */
+
+EXPR_RELACIONAL ::=
+      COR_INI OPERANDO_IGUALDAD COR_FIN
+      IGUAL
+      COR_INI OPERANDO_IGUALDAD COR_FIN
+    ;
+
+
+/* ---- Diferente ---- */
+
+EXPR_RELACIONAL ::=
+      COR_INI OPERANDO_IGUALDAD COR_FIN
+      DIFERENTE
+      COR_INI OPERANDO_IGUALDAD COR_FIN
+    ;
+
+
+/* ==========================================
+   14. VARIABLES Y ASIGNACIONES
    ========================================== */
 
 DECLARACION_VAR_SIMPLE ::=
@@ -579,7 +675,7 @@ EXPR_SIN_ASIGNACION ::=
 
 
 /* ==========================================
-   14. ARREGLOS
+   15. ARREGLOS
    ========================================== */
 
 LISTA_INT ::=
@@ -635,7 +731,7 @@ ARREGLO ::=
 
 
 /* ==========================================
-   15. ACCESO A ARREGLOS
+   16. ACCESO A ARREGLOS
    ========================================== */
 
 INDICE ::=
@@ -649,7 +745,7 @@ ACCESO_ARREGLO ::=
 
 
 /* ==========================================
-   16. ASIGNACION DE ARREGLOS
+   17. ASIGNACION DE ARREGLOS
    ========================================== */
 
 ASIGNACION_ARREGLO ::=
@@ -658,7 +754,7 @@ ASIGNACION_ARREGLO ::=
 
 
 /* ==========================================
-   17. ENTRADA
+   18. ENTRADA
    ========================================== */
 
 SENTENCIA_READ ::=
@@ -667,7 +763,7 @@ SENTENCIA_READ ::=
 
 
 /* ==========================================
-   18. SALIDA
+   19. SALIDA
    ========================================== */
 
 OPERANDO_WRITE ::=
@@ -685,7 +781,7 @@ SENTENCIA_WRITE ::=
 
 
 /* ==========================================
-   19. RETURN Y BREAK
+   20. RETURN Y BREAK
    ========================================== */
 
 SENTENCIA_RETURN ::=
@@ -699,7 +795,7 @@ SENTENCIA_BREAK ::=
 
 
 /* ==========================================
-   20. IF - ELIF - ELSE
+   21. IF - ELIF - ELSE
    ========================================== */
 
 SENTENCIA_IF ::=
@@ -727,7 +823,7 @@ SENTENCIA_ELIF_LISTA ::=
 
 
 /* ==========================================
-   21. WHILE
+   22. WHILE
    ========================================== */
 
 SENTENCIA_WHILE ::=
@@ -736,7 +832,7 @@ SENTENCIA_WHILE ::=
 
 
 /* ==========================================
-   22. FOR
+   23. FOR
    ========================================== */
 
 SENTENCIA_FOR_INIT ::=
