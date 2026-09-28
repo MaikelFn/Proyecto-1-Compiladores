@@ -123,6 +123,29 @@ non terminal EXPR_SIN_ASIGNACION;
 
 non terminal EXPRESION;
 
+
+/* ==========================================
+   EXPRESIONES ARITMETICAS
+   ========================================== */
+
+non terminal OP_NEG;
+
+non terminal EXPR_NEGATIVO;
+non terminal EXPR_INCREMENTO;
+non terminal EXPR_DECREMENTO;
+
+non terminal OPERANDO;
+
+non terminal EXPR_POTENCIA;
+non terminal EXPR_SUMA_RESTA;
+non terminal EXPR_MULT_DIV;
+non terminal EXPR_ARITMETICA;
+
+
+/* ==========================================
+   CONTROL DE FLUJO
+   ========================================== */
+
 non terminal SENTENCIA_IF;
 non terminal SENTENCIA_IF_RESTO;
 non terminal SENTENCIA_ELIF_LISTA;
@@ -133,9 +156,19 @@ non terminal SENTENCIA_FOR;
 non terminal SENTENCIA_FOR_INIT;
 non terminal SENTENCIA_FOR_INCREMENTO;
 
+
+/* ==========================================
+   ENTRADA Y SALIDA
+   ========================================== */
+
 non terminal SENTENCIA_READ;
 non terminal SENTENCIA_WRITE;
 non terminal OPERANDO_WRITE;
+
+
+/* ==========================================
+   RETURN Y BREAK
+   ========================================== */
 
 non terminal SENTENCIA_RETURN;
 non terminal SENTENCIA_BREAK;
@@ -154,19 +187,28 @@ start with PROGRAMA;
 
 PROGRAMA ::=
       FUNCION_MAIN
-    | LISTA_ELEMENTOS FUNCION_MAIN
+    ;
+
+PROGRAMA ::=
+      LISTA_ELEMENTOS FUNCION_MAIN
     ;
 
 
 LISTA_ELEMENTOS ::=
       ELEMENTO_PROGRAMA
-    | ELEMENTO_PROGRAMA LISTA_ELEMENTOS
+    ;
+
+LISTA_ELEMENTOS ::=
+      ELEMENTO_PROGRAMA LISTA_ELEMENTOS
     ;
 
 
 ELEMENTO_PROGRAMA ::=
       DECLARACION_GLOBAL
-    | DECLARACION_FUNCION
+    ;
+
+ELEMENTO_PROGRAMA ::=
+      DECLARACION_FUNCION
     ;
 
 
@@ -176,8 +218,14 @@ ELEMENTO_PROGRAMA ::=
 
 DECLARACION_GLOBAL ::=
       DECLARACION_VAR_SIMPLE
-    | DECLARACION_VAR_ASIGNADA
-    | ARREGLO
+    ;
+
+DECLARACION_GLOBAL ::=
+      DECLARACION_VAR_ASIGNADA
+    ;
+
+DECLARACION_GLOBAL ::=
+      ARREGLO
     ;
 
 
@@ -222,7 +270,10 @@ PARAMETRO ::=
 
 PARAMETROS ::=
       PARAMETRO
-    | PARAMETRO COMA PARAMETROS
+    ;
+
+PARAMETROS ::=
+      PARAMETRO COMA PARAMETROS
     ;
 
 
@@ -250,7 +301,10 @@ ARGUMENTO ::=
 
 ARGUMENTOS ::=
       ARGUMENTO
-    | ARGUMENTO COMA ARGUMENTOS
+    ;
+
+ARGUMENTOS ::=
+      ARGUMENTO COMA ARGUMENTOS
     ;
 
 
@@ -278,8 +332,12 @@ BLOQUE ::=
 
 LISTA_SENTENCIAS ::=
       SENTENCIA
-    | SENTENCIA LISTA_SENTENCIAS
     ;
+
+LISTA_SENTENCIAS ::=
+      SENTENCIA LISTA_SENTENCIAS
+    ;
+
 
 /* ==========================================
    10. SENTENCIAS
@@ -339,19 +397,11 @@ SENTENCIA ::=
 
 
 /* ==========================================
-   11. EXPRESION GENERAL TEMPORAL
+   11. EXPRESION GENERAL
    ========================================== */
 
 EXPRESION ::=
-      ID
-    ;
-
-EXPRESION ::=
-      LIT_INT
-    ;
-
-EXPRESION ::=
-      LIT_FLOAT
+      EXPR_ARITMETICA
     ;
 
 EXPRESION ::=
@@ -366,12 +416,141 @@ EXPRESION ::=
       LIT_STRING
     ;
 
-EXPRESION ::=
+
+/* ==========================================
+   12. EXPRESIONES ARITMETICAS
+   ========================================== */
+
+
+/* ---- Operador negativo ---- */
+
+OP_NEG ::=
+      RESTA
+    ;
+
+
+/* ---- Expresion negativa ---- */
+
+EXPR_NEGATIVO ::=
+      OP_NEG LIT_INT
+    ;
+
+EXPR_NEGATIVO ::=
+      OP_NEG LIT_FLOAT
+    ;
+
+
+/* ---- Incremento ---- */
+
+EXPR_INCREMENTO ::=
+      ID INCREMENTO
+    ;
+
+
+/* ---- Decremento ---- */
+
+EXPR_DECREMENTO ::=
+      ID DECREMENTO
+    ;
+
+
+/* ---- Operandos ---- */
+
+OPERANDO ::=
+      ID
+    ;
+
+OPERANDO ::=
+      LIT_INT
+    ;
+
+OPERANDO ::=
+      LIT_FLOAT
+    ;
+
+OPERANDO ::=
+      ACCESO_ARREGLO
+    ;
+
+OPERANDO ::=
+      PAR_INI EXPR_ARITMETICA PAR_FIN
+    ;
+
+OPERANDO ::=
+      EXPR_NEGATIVO
+    ;
+
+OPERANDO ::=
+      EXPR_INCREMENTO
+    ;
+
+OPERANDO ::=
+      EXPR_DECREMENTO
+    ;
+
+OPERANDO ::=
       LLAMADA_FUNCION
     ;
 
+
+/* ---- Potencia ---- */
+
+EXPR_POTENCIA ::=
+      OPERANDO
+    ;
+
+EXPR_POTENCIA ::=
+      OPERANDO POTENCIA EXPR_POTENCIA
+    ;
+
+
+/* ---- Suma y resta ---- */
+
+EXPR_SUMA_RESTA ::=
+      EXPR_POTENCIA
+    ;
+
+EXPR_SUMA_RESTA ::=
+      EXPR_SUMA_RESTA SUMA EXPR_POTENCIA
+    ;
+
+EXPR_SUMA_RESTA ::=
+      EXPR_SUMA_RESTA RESTA EXPR_POTENCIA
+    ;
+
+
+/* ---- Multiplicacion y division ---- */
+
+EXPR_MULT_DIV ::=
+      EXPR_SUMA_RESTA
+    ;
+
+EXPR_MULT_DIV ::=
+      EXPR_MULT_DIV MULTIPLICACION EXPR_SUMA_RESTA
+    ;
+
+EXPR_MULT_DIV ::=
+      EXPR_MULT_DIV DIVISION EXPR_SUMA_RESTA
+    ;
+
+EXPR_MULT_DIV ::=
+      EXPR_MULT_DIV DIVISION_ENTERA EXPR_SUMA_RESTA
+    ;
+
+
+/* ---- Modulo ---- */
+
+EXPR_ARITMETICA ::=
+      EXPR_MULT_DIV
+    ;
+
+EXPR_ARITMETICA ::=
+      EXPR_ARITMETICA MODULO EXPR_MULT_DIV
+    ;
+
+
 /* ==========================================
-   12. VARIABLES Y ASIGNACIONES
+   13. VARIABLES Y ASIGNACIONES
    ========================================== */
 
 DECLARACION_VAR_SIMPLE ::=
@@ -400,18 +579,24 @@ EXPR_SIN_ASIGNACION ::=
 
 
 /* ==========================================
-   13. ARREGLOS
+   14. ARREGLOS
    ========================================== */
 
 LISTA_INT ::=
       LIT_INT
-    | LIT_INT COMA LISTA_INT
+    ;
+
+LISTA_INT ::=
+      LIT_INT COMA LISTA_INT
     ;
 
 
 LISTA_FLOAT ::=
       LIT_FLOAT
-    | LIT_FLOAT COMA LISTA_FLOAT
+    ;
+
+LISTA_FLOAT ::=
+      LIT_FLOAT COMA LISTA_FLOAT
     ;
 
 
@@ -442,12 +627,15 @@ ARREGLO_FLOAT ::=
 
 ARREGLO ::=
       ARREGLO_INT
-    | ARREGLO_FLOAT
+    ;
+
+ARREGLO ::=
+      ARREGLO_FLOAT
     ;
 
 
 /* ==========================================
-   14. ACCESO A ARREGLOS
+   15. ACCESO A ARREGLOS
    ========================================== */
 
 INDICE ::=
@@ -461,7 +649,7 @@ ACCESO_ARREGLO ::=
 
 
 /* ==========================================
-   15. ASIGNACION DE ARREGLOS
+   16. ASIGNACION DE ARREGLOS
    ========================================== */
 
 ASIGNACION_ARREGLO ::=
@@ -470,7 +658,7 @@ ASIGNACION_ARREGLO ::=
 
 
 /* ==========================================
-   16. ENTRADA
+   17. ENTRADA
    ========================================== */
 
 SENTENCIA_READ ::=
@@ -479,7 +667,7 @@ SENTENCIA_READ ::=
 
 
 /* ==========================================
-   17. SALIDA
+   18. SALIDA
    ========================================== */
 
 OPERANDO_WRITE ::=
@@ -497,7 +685,7 @@ SENTENCIA_WRITE ::=
 
 
 /* ==========================================
-   18. RETURN Y BREAK
+   19. RETURN Y BREAK
    ========================================== */
 
 SENTENCIA_RETURN ::=
@@ -511,7 +699,7 @@ SENTENCIA_BREAK ::=
 
 
 /* ==========================================
-   19. IF - ELIF - ELSE
+   20. IF - ELIF - ELSE
    ========================================== */
 
 SENTENCIA_IF ::=
@@ -539,7 +727,7 @@ SENTENCIA_ELIF_LISTA ::=
 
 
 /* ==========================================
-   20. WHILE
+   21. WHILE
    ========================================== */
 
 SENTENCIA_WHILE ::=
@@ -548,19 +736,28 @@ SENTENCIA_WHILE ::=
 
 
 /* ==========================================
-   21. FOR
+   22. FOR
    ========================================== */
 
 SENTENCIA_FOR_INIT ::=
       DECLARACION_VAR_ASIGNADA
-    | ASIGNACION_VAR
+    ;
+
+SENTENCIA_FOR_INIT ::=
+      ASIGNACION_VAR
     ;
 
 
 SENTENCIA_FOR_INCREMENTO ::=
-      ID INCREMENTO
-    | ID DECREMENTO
-    | ASIGNACION_VAR_SIN_FIN
+      EXPR_INCREMENTO
+    ;
+
+SENTENCIA_FOR_INCREMENTO ::=
+      EXPR_DECREMENTO
+    ;
+
+SENTENCIA_FOR_INCREMENTO ::=
+      ASIGNACION_VAR_SIN_FIN
     ;
 
 
