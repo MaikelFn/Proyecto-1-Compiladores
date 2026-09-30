@@ -71,6 +71,7 @@ Token: LIT_INT | Lexema: 4 | Linea: 20
 Token: COMA | Lexema: , | Linea: 20
 Token: LIT_INT | Lexema: 5 | Linea: 20
 Token: BLOQUE_FIN | Lexema: :? | Linea: 20
+Token: FIN_EXPR | Lexema: » | Linea: 20
 Token: VAL | Lexema: val | Linea: 21
 Token: FLOAT | Lexema: float | Linea: 21
 Token: ID | Lexema: voltajes | Linea: 21
@@ -87,6 +88,7 @@ Token: LIT_FLOAT | Lexema: 3.5 | Linea: 21
 Token: COMA | Lexema: , | Linea: 21
 Token: LIT_FLOAT | Lexema: 4.5 | Linea: 21
 Token: BLOQUE_FIN | Lexema: :? | Linea: 21
+Token: FIN_EXPR | Lexema: » | Linea: 21
 Token: INT | Lexema: int | Linea: 33
 Token: ID | Lexema: obtenerLimite | Linea: 33
 Token: PAR_INI | Lexema: є: | Linea: 33
@@ -474,6 +476,7 @@ Token: LIT_INT | Lexema: 40 | Linea: 189
 Token: COMA | Lexema: , | Linea: 189
 Token: LIT_INT | Lexema: 50 | Linea: 189
 Token: BLOQUE_FIN | Lexema: :? | Linea: 189
+Token: FIN_EXPR | Lexema: » | Linea: 189
 Token: VAL | Lexema: val | Linea: 191
 Token: INT | Lexema: int | Linea: 191
 Token: ID | Lexema: primero | Linea: 191
