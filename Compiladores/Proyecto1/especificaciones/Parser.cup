@@ -1,9 +1,28 @@
 import java_cup.runtime.*;
+import java.util.ArrayList;
+import java.util.List;
 
 parser code {:
 
+    public List<String> erroresSintacticos = new ArrayList<>();
+
+    public boolean huboErrorSintactico() {
+        return !erroresSintacticos.isEmpty();
+    }
+
     public void syntax_error(Symbol s) {
-        report_error("token inesperado", s);
+        String lexema = (s.value != null) ? String.valueOf(s.value) : null;
+
+        String detalle;
+        if (s.sym == sym.EOF) {
+            detalle = "fin de archivo inesperado (el programa quedo incompleto)";
+        } else if (lexema != null) {
+            detalle = "token inesperado: '" + lexema + "'";
+        } else {
+            detalle = "token inesperado";
+        }
+
+        report_error(detalle, s);
     }
 
     public void report_error(String message, Object info) {
@@ -14,16 +33,18 @@ parser code {:
 
         if (info instanceof Symbol) {
 
-            Symbol sym = (Symbol) info;
+            Symbol s = (Symbol) info;
 
-            if (sym.left >= 0) {
-                m.append(" en linea ").append(sym.left);
+            if (s.left >= 0) {
+                m.append(" en linea ").append(s.left);
             }
         }
 
         m.append(": ").append(message);
 
-        System.out.println(m.toString());
+        String mensaje = m.toString();
+        System.out.println(mensaje);
+        erroresSintacticos.add(mensaje);
     }
 
     public void report_fatal_error(String message, Object info) {

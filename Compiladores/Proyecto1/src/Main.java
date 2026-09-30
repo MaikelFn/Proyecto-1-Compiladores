@@ -13,15 +13,25 @@ public class Main {
         String rutaTokens = "salida/tokens.txt";
         String rutaErrores = "salida/errores.txt";
 
-        analizarLexico(
+        boolean huboErroresLexicos = analizarLexico(
             rutaEntrada,
             rutaTokens,
             rutaErrores
         );
 
-        analizarSintactico(
-            rutaEntrada
+        boolean huboErroresSintacticos = analizarSintactico(
+            rutaEntrada,
+            rutaErrores
         );
+
+        boolean aceptado = !huboErroresLexicos && !huboErroresSintacticos;
+
+        System.out.println();
+        if (aceptado) {
+            System.out.println("El programa pertenece a la gramatica.");
+        } else {
+            System.out.println("El programa NO pertenece a la gramatica (ver " + rutaErrores + ").");
+        }
     }
 
 
@@ -29,11 +39,13 @@ public class Main {
        ANALISIS LEXICO
        ========================================== */
 
-    private static void analizarLexico(
+    private static boolean analizarLexico(
         String rutaEntrada,
         String rutaTokens,
         String rutaErrores
     ) {
+
+        boolean huboErrores = false;
 
         try (
             FileReader archivo = new FileReader(
@@ -62,6 +74,8 @@ public class Main {
 
                     String error =
                         lexer.obtenerSiguienteError();
+
+                    huboErrores = true;
 
                     System.out.println(error);
 
@@ -108,6 +122,8 @@ public class Main {
                 String error =
                     lexer.obtenerSiguienteError();
 
+                huboErrores = true;
+
                 System.out.println(error);
 
                 escritorErrores.write(error);
@@ -128,6 +144,8 @@ public class Main {
                 + e.getMessage()
             );
         }
+
+        return huboErrores;
     }
 
 
@@ -135,9 +153,12 @@ public class Main {
        ANALISIS SINTACTICO
        ========================================== */
 
-    private static void analizarSintactico(
-        String rutaEntrada
+    private static boolean analizarSintactico(
+        String rutaEntrada,
+        String rutaErrores
     ) {
+
+        Parser parser = null;
 
         try (
             FileReader archivo = new FileReader(
@@ -148,31 +169,42 @@ public class Main {
 
             Lexer lexer = new Lexer(archivo);
 
-            Parser parser = new Parser(lexer);
+            parser = new Parser(lexer);
 
             parser.parse();
-
 
             System.out.println();
             System.out.println(
                 "Analisis sintactico finalizado."
             );
 
-            System.out.println(
-                "El programa pertenece a la gramatica."
-            );
-
-
         } catch (Exception e) {
 
             System.out.println();
             System.out.println(
-                "El programa no pertenece a la gramatica."
-            );
-
-            System.out.println(
-                "Detalle: " + e.getMessage()
+                "El analisis sintactico se interrumpio: " + e.getMessage()
             );
         }
+
+        boolean huboErrores =
+            parser != null && parser.huboErrorSintactico();
+
+        if (huboErrores) {
+            try (FileWriter escritorErrores = new FileWriter(
+                    rutaErrores, StandardCharsets.UTF_8, true)) {
+
+                for (String error : parser.erroresSintacticos) {
+                    escritorErrores.write(error);
+                    escritorErrores.write("\n");
+                }
+
+            } catch (IOException e) {
+                System.out.println(
+                    "Error al escribir errores sintacticos: " + e.getMessage()
+                );
+            }
+        }
+
+        return huboErrores;
     }
 }
