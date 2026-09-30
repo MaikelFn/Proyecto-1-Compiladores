@@ -5,6 +5,7 @@
 
 %%
 
+
 /* ==========================================
    1. CONFIGURACION DEL ANALIZADOR
    ========================================== */
@@ -13,31 +14,78 @@
 %class Lexer
 %unicode
 %line
-%type String
+%cup
 
 %xstate COMENTARIO_MULTI
 
+
+%eofval{
+    return new java_cup.runtime.Symbol(
+        sym.EOF,
+        yyline + 1,
+        yyline + 1
+    );
+%eofval}
+
+
 %{
+
     private int lineaInicioComentario;
 
     private java.util.Queue<String> erroresPendientes =
         new java.util.ArrayDeque<>();
 
+
+    /*
+     * Devuelve la linea actual comenzando desde 1.
+     */
     public int getLinea() {
         return yyline + 1;
     }
 
+
+    /*
+     * Crea un Symbol compatible con CUP.
+     *
+     * tipo  = identificador definido en sym.java
+     * left  = linea del token
+     * right = linea del token
+     * value = lexema reconocido
+     */
+    private java_cup.runtime.Symbol simbolo(int tipo) {
+
+        return new java_cup.runtime.Symbol(
+            tipo,
+            yyline + 1,
+            yyline + 1,
+            yytext()
+        );
+    }
+
+
+    /*
+     * Guarda temporalmente los errores lexicos.
+     */
     private void registrarError(String mensaje) {
         erroresPendientes.add(mensaje);
     }
 
+
+    /*
+     * Indica si existen errores lexicos pendientes.
+     */
     public boolean hayErroresPendientes() {
         return !erroresPendientes.isEmpty();
     }
 
+
+    /*
+     * Obtiene y elimina el siguiente error pendiente.
+     */
     public String obtenerSiguienteError() {
         return erroresPendientes.poll();
     }
+
 %}
 
 
@@ -162,27 +210,27 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    ========================================== */
 
 "int" {
-    return "INT";
+    return simbolo(sym.INT);
 }
 
 "float" {
-    return "FLOAT";
+    return simbolo(sym.FLOAT);
 }
 
 "bool" {
-    return "BOOL";
+    return simbolo(sym.BOOL);
 }
 
 "char" {
-    return "CHAR";
+    return simbolo(sym.CHAR);
 }
 
 "string" {
-    return "STRING";
+    return simbolo(sym.STRING);
 }
 
 "void" {
-    return "VOID";
+    return simbolo(sym.VOID);
 }
 
 
@@ -191,47 +239,47 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    ========================================== */
 
 "principal" {
-    return "PRINCIPAL";
+    return simbolo(sym.PRINCIPAL);
 }
 
 "if" {
-    return "IF";
+    return simbolo(sym.IF);
 }
 
 "elif" {
-    return "ELIF";
+    return simbolo(sym.ELIF);
 }
 
 "else" {
-    return "ELSE";
+    return simbolo(sym.ELSE);
 }
 
 "while" {
-    return "WHILE";
+    return simbolo(sym.WHILE);
 }
 
 "for" {
-    return "FOR";
+    return simbolo(sym.FOR);
 }
 
 "return" {
-    return "RETURN";
+    return simbolo(sym.RETURN);
 }
 
 "break" {
-    return "BREAK";
+    return simbolo(sym.BREAK);
 }
 
 "val" {
-    return "VAL";
+    return simbolo(sym.VAL);
 }
 
 "read" {
-    return "READ";
+    return simbolo(sym.READ);
 }
 
 "write" {
-    return "WRITE";
+    return simbolo(sym.WRITE);
 }
 
 
@@ -240,39 +288,39 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    ========================================== */
 
 "++" {
-    return "INCREMENTO";
+    return simbolo(sym.INCREMENTO);
 }
 
 "--" {
-    return "DECREMENTO";
+    return simbolo(sym.DECREMENTO);
 }
 
 "//" {
-    return "DIVISION_ENTERA";
+    return simbolo(sym.DIVISION_ENTERA);
 }
 
 "+" {
-    return "SUMA";
+    return simbolo(sym.SUMA);
 }
 
 "-" {
-    return "RESTA";
+    return simbolo(sym.RESTA);
 }
 
 "*" {
-    return "MULTIPLICACION";
+    return simbolo(sym.MULTIPLICACION);
 }
 
 "/" {
-    return "DIVISION";
+    return simbolo(sym.DIVISION);
 }
 
 "mod" {
-    return "MODULO";
+    return simbolo(sym.MODULO);
 }
 
 "pot" {
-    return "POTENCIA";
+    return simbolo(sym.POTENCIA);
 }
 
 
@@ -281,27 +329,27 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    ========================================== */
 
 "<=" {
-    return "MENOR_IGUAL";
+    return simbolo(sym.MENOR_IGUAL);
 }
 
 ">=" {
-    return "MAYOR_IGUAL";
+    return simbolo(sym.MAYOR_IGUAL);
 }
 
 "==" {
-    return "IGUAL";
+    return simbolo(sym.IGUAL);
 }
 
 "!=" {
-    return "DIFERENTE";
+    return simbolo(sym.DIFERENTE);
 }
 
 "<" {
-    return "MENOR";
+    return simbolo(sym.MENOR);
 }
 
 ">" {
-    return "MAYOR";
+    return simbolo(sym.MAYOR);
 }
 
 
@@ -310,15 +358,15 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    ========================================== */
 
 "λ" {
-    return "AND";
+    return simbolo(sym.AND);
 }
 
 "θ" {
-    return "OR";
+    return simbolo(sym.OR);
 }
 
 "Σ" {
-    return "NOT";
+    return simbolo(sym.NOT);
 }
 
 
@@ -327,7 +375,7 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    ========================================== */
 
 "Ͱ" {
-    return "ASIGNACION";
+    return simbolo(sym.ASIGNACION);
 }
 
 
@@ -336,35 +384,35 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    ========================================== */
 
 "¿:" {
-    return "BLOQUE_INI";
+    return simbolo(sym.BLOQUE_INI);
 }
 
 ":?" {
-    return "BLOQUE_FIN";
+    return simbolo(sym.BLOQUE_FIN);
 }
 
 "є:" {
-    return "PAR_INI";
+    return simbolo(sym.PAR_INI);
 }
 
 ":э" {
-    return "PAR_FIN";
+    return simbolo(sym.PAR_FIN);
 }
 
 "ʃ:" {
-    return "COR_INI";
+    return simbolo(sym.COR_INI);
 }
 
 ":ʅ" {
-    return "COR_FIN";
+    return simbolo(sym.COR_FIN);
 }
 
 "»" {
-    return "FIN_EXPR";
+    return simbolo(sym.FIN_EXPR);
 }
 
 "," {
-    return "COMA";
+    return simbolo(sym.COMA);
 }
 
 
@@ -373,19 +421,19 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    ========================================== */
 
 {Lit_Bool} {
-    return "LIT_BOOL";
+    return simbolo(sym.LIT_BOOL);
 }
 
 {Lit_Char} {
-    return "LIT_CHAR";
+    return simbolo(sym.LIT_CHAR);
 }
 
 {Lit_String} {
-    return "LIT_STRING";
+    return simbolo(sym.LIT_STRING);
 }
 
 {Lit_Float} {
-    return "LIT_FLOAT";
+    return simbolo(sym.LIT_FLOAT);
 }
 
 
@@ -394,6 +442,7 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    ========================================== */
 
 {Float_Entera_Invalida} {
+
     registrarError(
         "Error lexico en linea " + (yyline + 1)
         + ": parte entera invalida en literal flotante "
@@ -402,7 +451,9 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
     );
 }
 
+
 {Float_Decimal_Invalida} {
+
     registrarError(
         "Error lexico en linea " + (yyline + 1)
         + ": parte decimal invalida en literal flotante "
@@ -411,7 +462,9 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
     );
 }
 
+
 {Float_Sin_Decimal} {
+
     registrarError(
         "Error lexico en linea " + (yyline + 1)
         + ": literal flotante sin parte decimal "
@@ -419,7 +472,9 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
     );
 }
 
+
 {Float_Sin_Entera} {
+
     registrarError(
         "Error lexico en linea " + (yyline + 1)
         + ": literal flotante sin parte entera "
@@ -433,6 +488,7 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    ========================================== */
 
 {Int_Cero_Inicial} {
+
     registrarError(
         "Error lexico en linea " + (yyline + 1)
         + ": literal entero invalido "
@@ -441,8 +497,9 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
     );
 }
 
+
 {Lit_Int} {
-    return "LIT_INT";
+    return simbolo(sym.LIT_INT);
 }
 
 
@@ -451,6 +508,7 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    ========================================== */
 
 {Lit_Char_Invalido} {
+
     registrarError(
         "Error lexico en linea " + (yyline + 1)
         + ": literal char invalido "
@@ -465,6 +523,7 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    ========================================== */
 
 {Char_Comillas_Mezcladas} {
+
     registrarError(
         "Error lexico en linea " + (yyline + 1)
         + ": comillas mezcladas en literal "
@@ -472,7 +531,9 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
     );
 }
 
+
 {String_Comillas_Mezcladas} {
+
     registrarError(
         "Error lexico en linea " + (yyline + 1)
         + ": comillas mezcladas en literal "
@@ -486,6 +547,7 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    ========================================== */
 
 {String_Sin_Cerrar} {
+
     registrarError(
         "Error lexico en linea " + (yyline + 1)
         + ": string sin cerrar "
@@ -493,7 +555,9 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
     );
 }
 
+
 {Char_Sin_Cerrar} {
+
     registrarError(
         "Error lexico en linea " + (yyline + 1)
         + ": char sin cerrar "
@@ -507,7 +571,7 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    ========================================== */
 
 {Id} {
-    return "ID";
+    return simbolo(sym.ID);
 }
 
 
@@ -516,25 +580,33 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    ========================================== */
 
 {Comentario_Linea} {
-    /* Ignorar */
+    /* Ignorar comentario de una linea */
 }
 
+
 "¡" {
+
     lineaInicioComentario = yyline + 1;
+
     yybegin(COMENTARIO_MULTI);
 }
 
+
 <COMENTARIO_MULTI> "!" {
+
     yybegin(YYINITIAL);
 }
 
+
 <COMENTARIO_MULTI> [^!\r\n]+ {
-    /* Ignorar */
+    /* Ignorar contenido */
 }
 
+
 <COMENTARIO_MULTI> \r\n|\r|\n {
-    /* Ignorar */
+    /* Ignorar salto de linea */
 }
+
 
 <COMENTARIO_MULTI> <<EOF>> {
 
@@ -544,7 +616,11 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
         + ": comentario multilinea no fue cerrado con !"
     );
 
-    return null;
+    return new java_cup.runtime.Symbol(
+        sym.EOF,
+        yyline + 1,
+        yyline + 1
+    );
 }
 
 
@@ -562,6 +638,7 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    ========================================== */
 
 [^] {
+
     registrarError(
         "Error lexico en linea " + (yyline + 1)
         + ": caracter no reconocido '"

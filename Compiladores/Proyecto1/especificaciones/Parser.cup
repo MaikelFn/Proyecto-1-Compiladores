@@ -351,7 +351,7 @@ BLOQUE ::=
 
 
 LISTA_SENTENCIAS ::=
-      SENTENCIA
+      /* vacio */
     ;
 
 LISTA_SENTENCIAS ::=
