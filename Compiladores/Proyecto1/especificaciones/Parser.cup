@@ -438,6 +438,15 @@ SENTENCIA ::=
 
 
 /* ==========================================
+   RECUPERACION EN MODO PANICO
+   ========================================== */
+
+SENTENCIA ::=
+      error FIN_EXPR
+    ;
+
+
+/* ==========================================
    11. EXPRESION GENERAL
    ========================================== */
 
@@ -780,6 +789,10 @@ EXPR_SIN_ASIGNACION ::=
    ========================================== */
 
 LISTA_INT ::=
+      /* vacio */
+    ;
+
+LISTA_INT ::=
       LIT_INT
     ;
 
@@ -787,6 +800,10 @@ LISTA_INT ::=
       LIT_INT COMA LISTA_INT
     ;
 
+
+LISTA_FLOAT ::=
+      /* vacio */
+    ;
 
 LISTA_FLOAT ::=
       LIT_FLOAT
@@ -836,7 +853,7 @@ ARREGLO ::=
    ========================================== */
 
 INDICE ::=
-      LIT_INT
+      EXPR_ARITMETICA
     ;
 
 

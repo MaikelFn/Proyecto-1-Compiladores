@@ -11,17 +11,18 @@ public class Main {
 
         String rutaEntrada = "pruebas/Prueba.txt";
         String rutaTokens = "salida/tokens.txt";
-        String rutaErrores = "salida/errores.txt";
+        String rutaErroresLexicos = "salida/errores_lexicos.txt";
+        String rutaErroresSintacticos = "salida/errores_sintacticos.txt";
 
         boolean huboErroresLexicos = analizarLexico(
             rutaEntrada,
             rutaTokens,
-            rutaErrores
+            rutaErroresLexicos
         );
 
         boolean huboErroresSintacticos = analizarSintactico(
             rutaEntrada,
-            rutaErrores
+            rutaErroresSintacticos
         );
 
         boolean aceptado = !huboErroresLexicos && !huboErroresSintacticos;
@@ -30,7 +31,13 @@ public class Main {
         if (aceptado) {
             System.out.println("El programa pertenece a la gramatica.");
         } else {
-            System.out.println("El programa NO pertenece a la gramatica (ver " + rutaErrores + ").");
+            System.out.println("El programa NO pertenece a la gramatica.");
+            if (huboErroresLexicos) {
+                System.out.println("Ver errores lexicos en: " + rutaErroresLexicos);
+            }
+            if (huboErroresSintacticos) {
+                System.out.println("Ver errores sintacticos en: " + rutaErroresSintacticos);
+            }
         }
     }
 
@@ -155,7 +162,7 @@ public class Main {
 
     private static boolean analizarSintactico(
         String rutaEntrada,
-        String rutaErrores
+        String rutaErroresSintacticos
     ) {
 
         Parser parser = null;
@@ -191,7 +198,7 @@ public class Main {
 
         if (huboErrores) {
             try (FileWriter escritorErrores = new FileWriter(
-                    rutaErrores, StandardCharsets.UTF_8, true)) {
+                    rutaErroresSintacticos, StandardCharsets.UTF_8)) {
 
                 for (String error : parser.erroresSintacticos) {
                     escritorErrores.write(error);

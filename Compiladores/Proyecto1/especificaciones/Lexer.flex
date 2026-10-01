@@ -115,8 +115,6 @@ Id = {Letra}{Caracter}*
 
 Lit_Int = 0|{Digito_No_Cero}{Digito}*
 
-Int_Cero_Inicial = 0{Digito}+
-
 
 /* ==========================================
    2.3 LITERALES FLOTANTES
@@ -484,19 +482,8 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
 
 
 /* ==========================================
-   3.10 ERRORES DE ENTEROS
+   3.10 LITERALES ENTEROS
    ========================================== */
-
-{Int_Cero_Inicial} {
-
-    registrarError(
-        "Error lexico en linea " + (yyline + 1)
-        + ": literal entero invalido "
-        + yytext()
-        + ". No se permiten ceros a la izquierda."
-    );
-}
-
 
 {Lit_Int} {
     return simbolo(sym.LIT_INT);
