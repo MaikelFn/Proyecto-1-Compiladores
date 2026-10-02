@@ -5,6 +5,11 @@ import java.util.List;
 parser code {:
 
     public List<String> erroresSintacticos = new ArrayList<>();
+    private final TablaSimbolos tablaSimbolos = new TablaSimbolos();
+
+    public TablaSimbolos getTablaSimbolos() {
+        return tablaSimbolos;
+    }
 
     public boolean huboErrorSintactico() {
         return !erroresSintacticos.isEmpty();
@@ -108,8 +113,8 @@ non terminal FUNCION_MAIN;
 
 non terminal DECLARACION_FUNCION;
 
-non terminal TIPO_RETORNO;
-non terminal TIPO;
+non terminal String TIPO_RETORNO;
+non terminal String TIPO;
 
 non terminal PARAMETROS;
 non terminal PARAMETRO;
@@ -120,6 +125,7 @@ non terminal ARGUMENTO;
 non terminal LLAMADA_FUNCION;
 
 non terminal BLOQUE;
+non terminal BLOQUE_FUNCION;
 
 non terminal LISTA_SENTENCIAS;
 non terminal SENTENCIA;
@@ -275,7 +281,10 @@ DECLARACION_GLOBAL ::=
    ========================================== */
 
 FUNCION_MAIN ::=
-      VOID PRINCIPAL PAR_INI PAR_FIN BLOQUE
+      VOID PRINCIPAL PAR_INI PAR_FIN
+      {: tablaSimbolos.abrirAmbito("principal"); :}
+      BLOQUE_FUNCION
+      {: tablaSimbolos.cerrarAmbito(); :}
     ;
 
 
@@ -284,19 +293,19 @@ FUNCION_MAIN ::=
    ========================================== */
 
 TIPO ::=
-      INT
-    | FLOAT
-    | BOOL
-    | CHAR
-    | STRING
+      INT    {: RESULT = "int"; :}
+    | FLOAT  {: RESULT = "float"; :}
+    | BOOL   {: RESULT = "bool"; :}
+    | CHAR   {: RESULT = "char"; :}
+    | STRING {: RESULT = "string"; :}
     ;
 
 
 TIPO_RETORNO ::=
-      INT
-    | FLOAT
-    | CHAR
-    | BOOL
+      INT   {: RESULT = "int"; :}
+    | FLOAT {: RESULT = "float"; :}
+    | CHAR  {: RESULT = "char"; :}
+    | BOOL  {: RESULT = "bool"; :}
     ;
 
 
@@ -305,7 +314,8 @@ TIPO_RETORNO ::=
    ========================================== */
 
 PARAMETRO ::=
-      TIPO ID
+      TIPO:tipo ID:id
+      {: tablaSimbolos.agregarSimbolo((String) id, (String) tipo, idleft, "parametro"); :}
     ;
 
 
@@ -323,11 +333,23 @@ PARAMETROS ::=
    ========================================== */
 
 DECLARACION_FUNCION ::=
-      TIPO_RETORNO ID PAR_INI PAR_FIN BLOQUE
+      TIPO_RETORNO:tipo ID:id PAR_INI
+      {:
+          tablaSimbolos.agregarSimbolo((String) id, (String) tipo, idleft, "funcion");
+          tablaSimbolos.abrirAmbito("funcion " + id);
+      :}
+      PAR_FIN BLOQUE_FUNCION
+      {: tablaSimbolos.cerrarAmbito(); :}
     ;
 
 DECLARACION_FUNCION ::=
-      TIPO_RETORNO ID PAR_INI PARAMETROS PAR_FIN BLOQUE
+      TIPO_RETORNO:tipo ID:id PAR_INI
+      {:
+          tablaSimbolos.agregarSimbolo((String) id, (String) tipo, idleft, "funcion");
+          tablaSimbolos.abrirAmbito("funcion " + id);
+      :}
+      PARAMETROS PAR_FIN BLOQUE_FUNCION
+      {: tablaSimbolos.cerrarAmbito(); :}
     ;
 
 
@@ -367,6 +389,12 @@ LLAMADA_FUNCION ::=
    ========================================== */
 
 BLOQUE ::=
+      BLOQUE_INI {: tablaSimbolos.abrirAmbitoBloque(); :}
+      LISTA_SENTENCIAS BLOQUE_FIN
+      {: tablaSimbolos.cerrarAmbito(); :}
+    ;
+
+BLOQUE_FUNCION ::=
       BLOQUE_INI LISTA_SENTENCIAS BLOQUE_FIN
     ;
 
@@ -752,20 +780,30 @@ EXPR_NEGACION_LOGICA ::=
    ========================================== */
 
 DECLARACION_VAR_SIMPLE ::=
-      VAL INT ID FIN_EXPR
-    | VAL FLOAT ID FIN_EXPR
-    | VAL BOOL ID FIN_EXPR
-    | VAL CHAR ID FIN_EXPR
-    | VAL STRING ID FIN_EXPR
+      VAL INT ID:id FIN_EXPR
+      {: tablaSimbolos.agregarSimbolo((String) id, "int", idleft, "variable"); :}
+    | VAL FLOAT ID:id FIN_EXPR
+      {: tablaSimbolos.agregarSimbolo((String) id, "float", idleft, "variable"); :}
+    | VAL BOOL ID:id FIN_EXPR
+      {: tablaSimbolos.agregarSimbolo((String) id, "bool", idleft, "variable"); :}
+    | VAL CHAR ID:id FIN_EXPR
+      {: tablaSimbolos.agregarSimbolo((String) id, "char", idleft, "variable"); :}
+    | VAL STRING ID:id FIN_EXPR
+      {: tablaSimbolos.agregarSimbolo((String) id, "string", idleft, "variable"); :}
     ;
 
 
 DECLARACION_VAR_ASIGNADA ::=
-      VAL INT ID ASIGNACION EXPRESION FIN_EXPR
-    | VAL FLOAT ID ASIGNACION EXPRESION FIN_EXPR
-    | VAL BOOL ID ASIGNACION EXPRESION FIN_EXPR
-    | VAL CHAR ID ASIGNACION EXPRESION FIN_EXPR
-    | VAL STRING ID ASIGNACION EXPRESION FIN_EXPR
+      VAL INT ID:id ASIGNACION EXPRESION FIN_EXPR
+      {: tablaSimbolos.agregarSimbolo((String) id, "int", idleft, "variable"); :}
+    | VAL FLOAT ID:id ASIGNACION EXPRESION FIN_EXPR
+      {: tablaSimbolos.agregarSimbolo((String) id, "float", idleft, "variable"); :}
+    | VAL BOOL ID:id ASIGNACION EXPRESION FIN_EXPR
+      {: tablaSimbolos.agregarSimbolo((String) id, "bool", idleft, "variable"); :}
+    | VAL CHAR ID:id ASIGNACION EXPRESION FIN_EXPR
+      {: tablaSimbolos.agregarSimbolo((String) id, "char", idleft, "variable"); :}
+    | VAL STRING ID:id ASIGNACION EXPRESION FIN_EXPR
+      {: tablaSimbolos.agregarSimbolo((String) id, "string", idleft, "variable"); :}
     ;
 
 
@@ -820,22 +858,26 @@ TAMANO_ARREGLO ::=
 
 
 ARREGLO_INT ::=
-      VAL INT ID COR_INI TAMANO_ARREGLO COR_FIN FIN_EXPR
+      VAL INT ID:id COR_INI TAMANO_ARREGLO COR_FIN FIN_EXPR
+      {: tablaSimbolos.agregarSimbolo((String) id, "int[]", idleft, "arreglo"); :}
     ;
 
 ARREGLO_INT ::=
-      VAL INT ID COR_INI TAMANO_ARREGLO COR_FIN
+      VAL INT ID:id COR_INI TAMANO_ARREGLO COR_FIN
       ASIGNACION BLOQUE_INI LISTA_INT BLOQUE_FIN FIN_EXPR
+      {: tablaSimbolos.agregarSimbolo((String) id, "int[]", idleft, "arreglo"); :}
     ;
 
 
 ARREGLO_FLOAT ::=
-      VAL FLOAT ID COR_INI TAMANO_ARREGLO COR_FIN FIN_EXPR
+      VAL FLOAT ID:id COR_INI TAMANO_ARREGLO COR_FIN FIN_EXPR
+      {: tablaSimbolos.agregarSimbolo((String) id, "float[]", idleft, "arreglo"); :}
     ;
 
 ARREGLO_FLOAT ::=
-      VAL FLOAT ID COR_INI TAMANO_ARREGLO COR_FIN
+      VAL FLOAT ID:id COR_INI TAMANO_ARREGLO COR_FIN
       ASIGNACION BLOQUE_INI LISTA_FLOAT BLOQUE_FIN FIN_EXPR
+      {: tablaSimbolos.agregarSimbolo((String) id, "float[]", idleft, "arreglo"); :}
     ;
 
 
