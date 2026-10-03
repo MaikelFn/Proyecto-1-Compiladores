@@ -5,8 +5,22 @@ import java.nio.charset.StandardCharsets;
 
 import java_cup.runtime.Symbol;
 
+/**
+ * Nombre: Main
+ * Descripcion: Punto de entrada principal del compilador. Ejecuta el analisis lexico,
+ * sintactico y genera los archivos de salida con los resultados correspondientes.
+ * Salidas: Genera archivos de tokens, errores y tabla de simbolos en la carpeta salida.
+ */
 public class Main {
 
+    /**
+     * Nombre: main
+     * Descripcion: Ejecuta la compilacion completa sobre la entrada especificada y muestra
+     * el resultado final del analisis junto con las rutas de los archivos generados.
+     * Salidas: No hay.
+     *
+     * @param args Argumentos recibidos al ejecutar el programa.
+     */
     public static void main(String[] args) {
 
         String rutaEntrada = "pruebas/Prueba.txt";
@@ -48,6 +62,17 @@ public class Main {
        ANALISIS LEXICO
        ========================================== */
 
+    /**
+     * Nombre: analizarLexico
+     * Descripcion: Lee el archivo de entrada, tokeniza el contenido y guarda los tokens y errores
+     * lexicos en los archivos indicados.
+     * Salidas: Genera un archivo de tokens y un archivo de errores lexicos.
+     *
+     * @param rutaEntrada Ruta del archivo fuente a analizar.
+     * @param rutaTokens Ruta del archivo donde se escribiran los tokens.
+     * @param rutaErrores Ruta del archivo donde se escribiran los errores lexicos.
+     * @return true si hubo errores lexicos; false en caso contrario.
+     */
     private static boolean analizarLexico(
         String rutaEntrada,
         String rutaTokens,
@@ -122,10 +147,6 @@ public class Main {
             }
 
 
-            /*
-             * Por seguridad, revisamos si quedó
-             * algún error pendiente al llegar al EOF.
-             */
             while (lexer.hayErroresPendientes()) {
 
                 String error =
@@ -162,6 +183,17 @@ public class Main {
        ANALISIS SINTACTICO
        ========================================== */
 
+    /**
+     * Nombre: analizarSintactico
+     * Descripcion: Ejecuta el analisis sintactico del archivo de entrada, recopila errores y
+     * guarda la tabla de simbolos resultante en un archivo de salida.
+     * Salidas: Genera un archivo de errores sintacticos y un archivo de tabla de simbolos.
+     *
+     * @param rutaEntrada Ruta del archivo fuente a analizar.
+     * @param rutaErroresSintacticos Ruta del archivo de errores sintacticos.
+     * @param rutaTablaSimbolos Ruta del archivo de salida para la tabla de simbolos.
+     * @return true si hubo errores sintacticos o si el analisis se interrumpio; false en caso contrario.
+     */
     private static boolean analizarSintactico(
         String rutaEntrada,
         String rutaErroresSintacticos,
@@ -239,6 +271,15 @@ public class Main {
        TABLA DE SIMBOLOS
        ========================================== */
 
+    /**
+     * Nombre: guardarTablaSimbolos
+     * Descripcion: Escribe en un archivo la informacion de todos los ambitos y simbolos
+     * registrados en la tabla de simbolos.
+     * Salidas: Genera un archivo de texto con la tabla de simbolos.
+     *
+     * @param tabla Tabla de simbolos a exportar.
+     * @param rutaSalida Ruta del archivo donde se guardara la tabla.
+     */
     private static void guardarTablaSimbolos(
         TablaSimbolos tabla,
         String rutaSalida
