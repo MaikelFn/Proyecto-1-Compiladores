@@ -5,6 +5,7 @@ import java.util.List;
 parser code {:
 
     public List<String> erroresSintacticos = new ArrayList<>();
+
     private final TablaSimbolos tablaSimbolos = new TablaSimbolos();
 
     public TablaSimbolos getTablaSimbolos() {
@@ -16,44 +17,51 @@ parser code {:
     }
 
     public void syntax_error(Symbol s) {
-        String lexema = (s.value != null) ? String.valueOf(s.value) : null;
 
-        String detalle;
-        if (s.sym == sym.EOF) {
-            detalle = "fin de archivo inesperado (el programa quedo incompleto)";
-        } else if (lexema != null) {
-            detalle = "token inesperado: '" + lexema + "'";
+        String lexema =
+            (s != null && s.value != null)
+            ? String.valueOf(s.value)
+            : "EOF";
+
+        int linea =
+            (s != null && s.left >= 0)
+            ? s.left
+            : -1;
+
+        String mensaje;
+
+        if (s != null && s.sym == sym.EOF) {
+            mensaje =
+                "[ERROR SINTACTICO] Linea "
+                + linea
+                + ": fin de archivo inesperado.";
         } else {
-            detalle = "token inesperado";
+            mensaje =
+                "[ERROR SINTACTICO] Linea "
+                + linea
+                + ": token inesperado -> '"
+                + lexema
+                + "'";
         }
 
-        report_error(detalle, s);
-    }
-
-    public void report_error(String message, Object info) {
-
-        StringBuilder m = new StringBuilder();
-
-        m.append("Error sintactico");
-
-        if (info instanceof Symbol) {
-
-            Symbol s = (Symbol) info;
-
-            if (s.left >= 0) {
-                m.append(" en linea ").append(s.left);
-            }
-        }
-
-        m.append(": ").append(message);
-
-        String mensaje = m.toString();
-        System.out.println(mensaje);
+        System.err.println(mensaje);
         erroresSintacticos.add(mensaje);
     }
 
-    public void report_fatal_error(String message, Object info) {
-        report_error(message, info);
+    public void unrecovered_syntax_error(Symbol s) {
+
+        int linea =
+            (s != null && s.left >= 0)
+            ? s.left
+            : -1;
+
+        String mensaje =
+            "[ERROR SINTACTICO IRRECUPERABLE] Linea "
+            + linea
+            + ": no se pudo continuar el analisis.";
+
+        System.err.println(mensaje);
+        erroresSintacticos.add(mensaje);
     }
 
 :};
@@ -114,7 +122,6 @@ non terminal FUNCION_MAIN;
 non terminal DECLARACION_FUNCION;
 
 non terminal String TIPO_RETORNO;
-non terminal String TIPO;
 
 non terminal PARAMETROS;
 non terminal PARAMETRO;
@@ -258,6 +265,10 @@ ELEMENTO_PROGRAMA ::=
       DECLARACION_FUNCION
     ;
 
+ELEMENTO_PROGRAMA ::=
+      error FIN_EXPR
+    ;
+
 
 /* ==========================================
    2. DECLARACIONES GLOBALES
@@ -292,15 +303,6 @@ FUNCION_MAIN ::=
    4. TIPOS
    ========================================== */
 
-TIPO ::=
-      INT    {: RESULT = "int"; :}
-    | FLOAT  {: RESULT = "float"; :}
-    | BOOL   {: RESULT = "bool"; :}
-    | CHAR   {: RESULT = "char"; :}
-    | STRING {: RESULT = "string"; :}
-    ;
-
-
 TIPO_RETORNO ::=
       INT   {: RESULT = "int"; :}
     | FLOAT {: RESULT = "float"; :}
@@ -314,8 +316,28 @@ TIPO_RETORNO ::=
    ========================================== */
 
 PARAMETRO ::=
-      TIPO:tipo ID:id
-      {: tablaSimbolos.agregarSimbolo((String) id, (String) tipo, idleft, "parametro"); :}
+      INT ID:id
+      {: tablaSimbolos.agregarSimbolo((String) id, "int", idleft, "parametro"); :}
+    ;
+
+PARAMETRO ::=
+      FLOAT ID:id
+      {: tablaSimbolos.agregarSimbolo((String) id, "float", idleft, "parametro"); :}
+    ;
+
+PARAMETRO ::=
+      BOOL ID:id
+      {: tablaSimbolos.agregarSimbolo((String) id, "bool", idleft, "parametro"); :}
+    ;
+
+PARAMETRO ::=
+      CHAR ID:id
+      {: tablaSimbolos.agregarSimbolo((String) id, "char", idleft, "parametro"); :}
+    ;
+
+PARAMETRO ::=
+      STRING ID:id
+      {: tablaSimbolos.agregarSimbolo((String) id, "string", idleft, "parametro"); :}
     ;
 
 
@@ -827,10 +849,6 @@ EXPR_SIN_ASIGNACION ::=
    ========================================== */
 
 LISTA_INT ::=
-      /* vacio */
-    ;
-
-LISTA_INT ::=
       LIT_INT
     ;
 
@@ -838,10 +856,6 @@ LISTA_INT ::=
       LIT_INT COMA LISTA_INT
     ;
 
-
-LISTA_FLOAT ::=
-      /* vacio */
-    ;
 
 LISTA_FLOAT ::=
       LIT_FLOAT
@@ -858,7 +872,8 @@ TAMANO_ARREGLO ::=
 
 
 ARREGLO_INT ::=
-      VAL INT ID:id COR_INI TAMANO_ARREGLO COR_FIN FIN_EXPR
+      VAL INT ID:id COR_INI TAMANO_ARREGLO COR_FIN
+      ASIGNACION BLOQUE_INI BLOQUE_FIN FIN_EXPR
       {: tablaSimbolos.agregarSimbolo((String) id, "int[]", idleft, "arreglo"); :}
     ;
 
@@ -870,7 +885,8 @@ ARREGLO_INT ::=
 
 
 ARREGLO_FLOAT ::=
-      VAL FLOAT ID:id COR_INI TAMANO_ARREGLO COR_FIN FIN_EXPR
+      VAL FLOAT ID:id COR_INI TAMANO_ARREGLO COR_FIN
+      ASIGNACION BLOQUE_INI BLOQUE_FIN FIN_EXPR
       {: tablaSimbolos.agregarSimbolo((String) id, "float[]", idleft, "arreglo"); :}
     ;
 

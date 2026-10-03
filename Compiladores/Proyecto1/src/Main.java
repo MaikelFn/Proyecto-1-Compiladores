@@ -13,6 +13,7 @@ public class Main {
         String rutaTokens = "salida/tokens.txt";
         String rutaErroresLexicos = "salida/errores_lexicos.txt";
         String rutaErroresSintacticos = "salida/errores_sintacticos.txt";
+        String rutaTablaSimbolos = "salida/tabla_simbolos.txt";
 
         boolean huboErroresLexicos = analizarLexico(
             rutaEntrada,
@@ -22,7 +23,8 @@ public class Main {
 
         boolean huboErroresSintacticos = analizarSintactico(
             rutaEntrada,
-            rutaErroresSintacticos
+            rutaErroresSintacticos,
+            rutaTablaSimbolos
         );
 
         boolean aceptado = !huboErroresLexicos && !huboErroresSintacticos;
@@ -162,10 +164,12 @@ public class Main {
 
     private static boolean analizarSintactico(
         String rutaEntrada,
-        String rutaErroresSintacticos
+        String rutaErroresSintacticos,
+        String rutaTablaSimbolos
     ) {
 
         Parser parser = null;
+        boolean analisisInterrumpido = false;
 
         try (
             FileReader archivo = new FileReader(
@@ -175,9 +179,7 @@ public class Main {
         ) {
 
             Lexer lexer = new Lexer(archivo);
-
             parser = new Parser(lexer);
-
             parser.parse();
 
             System.out.println();
@@ -187,31 +189,135 @@ public class Main {
 
         } catch (Exception e) {
 
+            analisisInterrumpido = true;
+
             System.out.println();
             System.out.println(
-                "El analisis sintactico se interrumpio: " + e.getMessage()
+                "El analisis sintactico se interrumpio: "
+                + e.getMessage()
             );
         }
 
         boolean huboErrores =
-            parser != null && parser.huboErrorSintactico();
+            analisisInterrumpido
+            || (parser != null && parser.huboErrorSintactico());
 
-        if (huboErrores) {
-            try (FileWriter escritorErrores = new FileWriter(
-                    rutaErroresSintacticos, StandardCharsets.UTF_8)) {
+        /* Siempre recrea el archivo para no dejar errores viejos. */
+        try (
+            FileWriter escritorErrores = new FileWriter(
+                rutaErroresSintacticos,
+                StandardCharsets.UTF_8
+            )
+        ) {
 
+            if (parser != null) {
                 for (String error : parser.erroresSintacticos) {
                     escritorErrores.write(error);
                     escritorErrores.write("\n");
                 }
-
-            } catch (IOException e) {
-                System.out.println(
-                    "Error al escribir errores sintacticos: " + e.getMessage()
-                );
             }
+
+        } catch (IOException e) {
+            System.out.println(
+                "Error al escribir errores sintacticos: "
+                + e.getMessage()
+            );
+        }
+
+        if (parser != null) {
+            guardarTablaSimbolos(
+                parser.getTablaSimbolos(),
+                rutaTablaSimbolos
+            );
         }
 
         return huboErrores;
     }
+
+
+    /* ==========================================
+       TABLA DE SIMBOLOS
+       ========================================== */
+
+    private static void guardarTablaSimbolos(
+        TablaSimbolos tabla,
+        String rutaSalida
+    ) {
+
+        try (
+            FileWriter escritor = new FileWriter(
+                rutaSalida,
+                StandardCharsets.UTF_8
+            )
+        ) {
+
+            for (
+                TablaSimbolos.Ambito ambito
+                : tabla.getAmbitos()
+            ) {
+
+                escritor.write(
+                    "=== TABLA DE SIMBOLOS: "
+                    + ambito.getRuta()
+                    + " ===\n"
+                );
+
+                escritor.write(
+                    String.format(
+                        "%-20s %-12s %-15s %s%n",
+                        "Nombre",
+                        "Tipo",
+                        "Categoria",
+                        "Linea"
+                    )
+                );
+
+                escritor.write(
+                    String.format(
+                        "%-20s %-12s %-15s %s%n",
+                        "------",
+                        "----",
+                        "---------",
+                        "-----"
+                    )
+                );
+
+                if (ambito.getSimbolos().isEmpty()) {
+                    escritor.write("(sin simbolos)\n");
+                } else {
+
+                    for (
+                        TablaSimbolos.Simbolo simbolo
+                        : ambito.getSimbolos()
+                    ) {
+
+                        escritor.write(
+                            String.format(
+                                "%-20s %-12s %-15s %d%n",
+                                simbolo.getNombre(),
+                                simbolo.getTipo(),
+                                simbolo.getCategoria(),
+                                simbolo.getLinea()
+                            )
+                        );
+                    }
+                }
+
+                escritor.write("\n");
+            }
+
+            System.out.println(
+                "Tabla de simbolos guardada en: "
+                + rutaSalida
+            );
+
+        } catch (IOException e) {
+
+            System.out.println(
+                "Error al guardar la tabla de simbolos: "
+                + e.getMessage()
+            );
+        }
+    }
+
 }

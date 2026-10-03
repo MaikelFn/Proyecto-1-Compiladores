@@ -122,7 +122,7 @@ Lit_Int = 0|{Digito_No_Cero}{Digito}*
 
 Parte_Entera = 0|{Digito_No_Cero}{Digito}*
 
-Parte_Decimal = {Digito}*{Digito_No_Cero}
+Parte_Decimal = 0|{Digito}*{Digito_No_Cero}
 
 Lit_Float = {Parte_Entera}"."{Parte_Decimal}
 
@@ -137,7 +137,7 @@ Float_Sin_Entera = "."{Digito}+
 
 Float_Entera_Invalida = 0{Digito}+"."{Digito}+
 
-Float_Decimal_Invalida = {Parte_Entera}"."{Digito}*"0"
+Float_Decimal_Invalida = {Parte_Entera}"."{Digito}+"0"
 
 
 /* ==========================================
@@ -430,6 +430,15 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
     return simbolo(sym.LIT_STRING);
 }
 
+{Float_Decimal_Invalida} {
+    registrarError(
+        "Error lexico en linea " + (yyline + 1)
+        + ": literal float invalido '"
+        + yytext()
+        + "'"
+    );
+}
+
 {Lit_Float} {
     return simbolo(sym.LIT_FLOAT);
 }
@@ -446,17 +455,6 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
         + ": parte entera invalida en literal flotante "
         + yytext()
         + ". No se permiten ceros a la izquierda."
-    );
-}
-
-
-{Float_Decimal_Invalida} {
-
-    registrarError(
-        "Error lexico en linea " + (yyline + 1)
-        + ": parte decimal invalida en literal flotante "
-        + yytext()
-        + ". La parte decimal debe terminar en un digito distinto de cero."
     );
 }
 
