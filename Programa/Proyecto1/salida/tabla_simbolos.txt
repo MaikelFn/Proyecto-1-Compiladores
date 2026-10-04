@@ -1,0 +1,183 @@
+=== TABLA DE SIMBOLOS: Global ===
+Nombre               Tipo         Categoria       Linea
+------               ----         ---------       -----
+contadorGlobal       int          variable        8
+limiteGlobal         int          variable        9
+temperaturaGlobal    float        variable        10
+voltajeGlobal        float        variable        11
+sistemaActivo        bool         variable        12
+modoSeguro           bool         variable        13
+estadoGlobal         char         variable        14
+nombreSistema        string       variable        15
+numeros              int[]        arreglo         19
+valores              int[]        arreglo         20
+voltajes             float[]      arreglo         21
+obtenerLimite        int          funcion         33
+duplicar             int          funcion         47
+sumar                int          funcion         59
+calcularVoltaje      float        funcion         67
+compararValores      bool         funcion         75
+operaciones          int          funcion         87
+clasificar           int          funcion         114
+contar               int          funcion         147
+recorrer             int          funcion         167
+trabajarArreglo      int          funcion         187
+validar              bool         funcion         207
+invertir             bool         funcion         221
+solicitarNumero      int          funcion         233
+buscarLimite         int          funcion         251
+sensores             float        funcion         275
+
+=== TABLA DE SIMBOLOS: Global / funcion obtenerLimite ===
+Nombre               Tipo         Categoria       Linea
+------               ----         ---------       -----
+resultado            int          variable        35
+
+=== TABLA DE SIMBOLOS: Global / funcion duplicar ===
+Nombre               Tipo         Categoria       Linea
+------               ----         ---------       -----
+numero               int          parametro       47
+resultado            int          variable        49
+
+=== TABLA DE SIMBOLOS: Global / funcion sumar ===
+Nombre               Tipo         Categoria       Linea
+------               ----         ---------       -----
+numeroA              int          parametro       59
+numeroB              int          parametro       59
+resultado            int          variable        61
+
+=== TABLA DE SIMBOLOS: Global / funcion calcularVoltaje ===
+Nombre               Tipo         Categoria       Linea
+------               ----         ---------       -----
+resistencia          float        parametro       67
+corriente            float        parametro       67
+resultado            float        variable        69
+
+=== TABLA DE SIMBOLOS: Global / funcion compararValores ===
+Nombre               Tipo         Categoria       Linea
+------               ----         ---------       -----
+valorA               int          parametro       75
+valorB               int          parametro       75
+resultado            bool         variable        77
+
+=== TABLA DE SIMBOLOS: Global / funcion operaciones ===
+Nombre               Tipo         Categoria       Linea
+------               ----         ---------       -----
+numeroA              int          parametro       87
+numeroB              int          parametro       87
+suma                 int          variable        89
+resta                int          variable        90
+multiplicacion       int          variable        91
+division             int          variable        92
+residuo              int          variable        93
+potencia             int          variable        94
+
+=== TABLA DE SIMBOLOS: Global / funcion clasificar ===
+Nombre               Tipo         Categoria       Linea
+------               ----         ---------       -----
+numero               int          parametro       114
+resultado            int          variable        116
+
+=== TABLA DE SIMBOLOS: Global / funcion clasificar / Bloque 1 ===
+Nombre               Tipo         Categoria       Linea
+------               ----         ---------       -----
+(sin simbolos)
+
+=== TABLA DE SIMBOLOS: Global / funcion clasificar / Bloque 2 ===
+Nombre               Tipo         Categoria       Linea
+------               ----         ---------       -----
+(sin simbolos)
+
+=== TABLA DE SIMBOLOS: Global / funcion clasificar / Bloque 3 ===
+Nombre               Tipo         Categoria       Linea
+------               ----         ---------       -----
+(sin simbolos)
+
+=== TABLA DE SIMBOLOS: Global / funcion contar ===
+Nombre               Tipo         Categoria       Linea
+------               ----         ---------       -----
+limite               int          parametro       147
+contador             int          variable        149
+
+=== TABLA DE SIMBOLOS: Global / funcion contar / Bloque 4 ===
+Nombre               Tipo         Categoria       Linea
+------               ----         ---------       -----
+(sin simbolos)
+
+=== TABLA DE SIMBOLOS: Global / funcion recorrer ===
+Nombre               Tipo         Categoria       Linea
+------               ----         ---------       -----
+limite               int          parametro       167
+acumulador           int          variable        169
+i                    int          variable        171
+
+=== TABLA DE SIMBOLOS: Global / funcion recorrer / Bloque 5 ===
+Nombre               Tipo         Categoria       Linea
+------               ----         ---------       -----
+(sin simbolos)
+
+=== TABLA DE SIMBOLOS: Global / funcion trabajarArreglo ===
+Nombre               Tipo         Categoria       Linea
+------               ----         ---------       -----
+datos                int[]        arreglo         189
+primero              int          variable        191
+segundo              int          variable        192
+
+=== TABLA DE SIMBOLOS: Global / funcion validar ===
+Nombre               Tipo         Categoria       Linea
+------               ----         ---------       -----
+edad                 int          parametro       207
+activo               bool         parametro       207
+mayor                bool         variable        209
+resultado            bool         variable        211
+
+=== TABLA DE SIMBOLOS: Global / funcion invertir ===
+Nombre               Tipo         Categoria       Linea
+------               ----         ---------       -----
+estado               bool         parametro       221
+resultado            bool         variable        223
+
+=== TABLA DE SIMBOLOS: Global / funcion solicitarNumero ===
+Nombre               Tipo         Categoria       Linea
+------               ----         ---------       -----
+numero               int          variable        235
+
+=== TABLA DE SIMBOLOS: Global / funcion buscarLimite ===
+Nombre               Tipo         Categoria       Linea
+------               ----         ---------       -----
+limite               int          parametro       251
+contador             int          variable        253
+
+=== TABLA DE SIMBOLOS: Global / funcion buscarLimite / Bloque 6 ===
+Nombre               Tipo         Categoria       Linea
+------               ----         ---------       -----
+(sin simbolos)
+
+=== TABLA DE SIMBOLOS: Global / funcion buscarLimite / Bloque 6 / Bloque 7 ===
+Nombre               Tipo         Categoria       Linea
+------               ----         ---------       -----
+(sin simbolos)
+
+=== TABLA DE SIMBOLOS: Global / funcion sensores ===
+Nombre               Tipo         Categoria       Linea
+------               ----         ---------       -----
+sensorA              float        parametro       275
+sensorB              float        parametro       275
+nombre               string       variable        277
+estado               char         variable        278
+promedio             float        variable        280
+
+=== TABLA DE SIMBOLOS: Global / principal ===
+Nombre               Tipo         Categoria       Linea
+------               ----         ---------       -----
+numeroA              int          variable        297
+numeroB              int          variable        298
+resultado            int          variable        299
+resistencia          float        variable        301
+corriente            float        variable        302
+voltaje              float        variable        303
+activo               bool         variable        305
+validacion           bool         variable        306
+estado               char         variable        308
+mensaje              string       variable        309
+

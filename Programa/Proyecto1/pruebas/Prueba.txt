@@ -16,7 +16,7 @@ val string nombreSistema Ͱ "ChipControl" »
 
 | Arreglos globales
 
-val int numeros ʃ:5:ʅ »
+val int numeros ʃ:5:ʅ Ͱ ¿::? »
 val int valores ʃ:5:ʅ Ͱ ¿:1,2,3,4,5:? »
 val float voltajes ʃ:4:ʅ Ͱ ¿:1.5,2.5,3.5,4.5:? »
 

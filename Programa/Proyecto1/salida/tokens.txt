@@ -52,6 +52,9 @@ Token: ID | Lexema: numeros | Linea: 19
 Token: COR_INI | Lexema: ʃ: | Linea: 19
 Token: LIT_INT | Lexema: 5 | Linea: 19
 Token: COR_FIN | Lexema: :ʅ | Linea: 19
+Token: ASIGNACION | Lexema: Ͱ | Linea: 19
+Token: BLOQUE_INI | Lexema: ¿: | Linea: 19
+Token: BLOQUE_FIN | Lexema: :? | Linea: 19
 Token: FIN_EXPR | Lexema: » | Linea: 19
 Token: VAL | Lexema: val | Linea: 20
 Token: INT | Lexema: int | Linea: 20
