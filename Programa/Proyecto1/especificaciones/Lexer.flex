@@ -14,6 +14,7 @@
 %class Lexer
 %unicode
 %line
+%column
 %cup
 
 %xstate COMENTARIO_MULTI
@@ -23,7 +24,7 @@
     return new java_cup.runtime.Symbol(
         sym.EOF,
         yyline + 1,
-        yyline + 1
+        yycolumn + 1
     );
 %eofval}
 
@@ -31,6 +32,7 @@
 %{
 
     private int lineaInicioComentario;
+    private int columnaInicioComentario;
 
     private java.util.Queue<String> erroresPendientes =
         new java.util.ArrayDeque<>();
@@ -49,7 +51,7 @@
      *
      * tipo  = identificador definido en sym.java
      * left  = linea del token
-     * right = linea del token
+     * right = columna del token
      * value = lexema reconocido
      */
     private java_cup.runtime.Symbol simbolo(int tipo) {
@@ -57,7 +59,7 @@
         return new java_cup.runtime.Symbol(
             tipo,
             yyline + 1,
-            yyline + 1,
+            yycolumn + 1,
             yytext()
         );
     }
@@ -68,6 +70,15 @@
      */
     private void registrarError(String mensaje) {
         erroresPendientes.add(mensaje);
+    }
+
+
+    private void registrarErrorLexico(String descripcion) {
+        registrarError(
+            "Error lexico en linea " + (yyline + 1)
+            + ", columna " + (yycolumn + 1)
+            + ": " + descripcion
+        );
     }
 
 
@@ -104,9 +115,9 @@ Digito = [0-9]
 
 Digito_No_Cero = [1-9]
 
-Caracter = {Letra}|{Digito}
+Caracter = {Letra}|{Digito}|"_"
 
-Id = {Letra}{Caracter}*
+Id = ({Letra}|"_"){Caracter}*
 
 
 /* ==========================================
@@ -151,23 +162,17 @@ Lit_Bool = "true"|"false"
    2.6 CARACTERES PERMITIDOS EN CHAR Y STRING
    ========================================== */
 
-Caracter_String = [^\"'»¿?є:эʃʅͰλθΣ|¡!\r\n]
+/* Caracteres internos y secuencias de escape */
+Escape = \\[^\r\n]
+Caracter_Char = [^'\\\r\n] | {Escape}
+Caracter_String = [^\"\\\r\n] | {Escape}
 
-
-/* ==========================================
-   2.7 LITERAL CHAR
-   ========================================== */
-
-Lit_Char = "'" {Caracter_String} "'"
-
-Lit_Char_Invalido = "'" {Caracter_String}* "'"
-
-
-/* ==========================================
-   2.8 LITERAL STRING
-   ========================================== */
-
+/* Literales */
+Lit_Char = "'" {Caracter_Char} "'"
 Lit_String = "\"" {Caracter_String}* "\""
+
+/* Char con longitud incorrecta */
+Lit_Char_Invalido = "'" {Caracter_Char}* "'"
 
 
 /* ==========================================
@@ -181,18 +186,19 @@ Comentario_Linea = \|[^\r\n]*
    2.10 LITERALES SIN CERRAR
    ========================================== */
 
-String_Sin_Cerrar = "\"" [^\"\r\n]*
+String_Sin_Cerrar = "\"" {Caracter_String}*
 
-Char_Sin_Cerrar = "'" [^'\r\n]*
+Char_Sin_Cerrar = "'" {Caracter_Char}*
 
 
 /* ==========================================
    2.11 COMILLAS MEZCLADAS
    ========================================== */
 
-Char_Comillas_Mezcladas = "'" [^\"\r\n]* "\""
-
-String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
+/* Esta sección está vacía - las reglas de comillas mezcladas
+   fueron eliminadas porque no son necesarias para reconocer
+   literales válidos y pueden consumir fragmentos que deberían
+   analizarse como tokens separados. */
 
 
 %%
@@ -431,11 +437,8 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
 }
 
 {Float_Decimal_Invalida} {
-    registrarError(
-        "Error lexico en linea " + (yyline + 1)
-        + ": literal float invalido '"
-        + yytext()
-        + "'"
+    registrarErrorLexico(
+        "literal float invalido '" + yytext() + "'"
     );
 }
 
@@ -449,10 +452,8 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    ========================================== */
 
 {Float_Entera_Invalida} {
-
-    registrarError(
-        "Error lexico en linea " + (yyline + 1)
-        + ": parte entera invalida en literal flotante "
+    registrarErrorLexico(
+        "parte entera invalida en literal flotante "
         + yytext()
         + ". No se permiten ceros a la izquierda."
     );
@@ -460,21 +461,15 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
 
 
 {Float_Sin_Decimal} {
-
-    registrarError(
-        "Error lexico en linea " + (yyline + 1)
-        + ": literal flotante sin parte decimal "
-        + yytext()
+    registrarErrorLexico(
+        "literal flotante sin parte decimal " + yytext()
     );
 }
 
 
 {Float_Sin_Entera} {
-
-    registrarError(
-        "Error lexico en linea " + (yyline + 1)
-        + ": literal flotante sin parte entera "
-        + yytext()
+    registrarErrorLexico(
+        "literal flotante sin parte entera " + yytext()
     );
 }
 
@@ -493,10 +488,8 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    ========================================== */
 
 {Lit_Char_Invalido} {
-
-    registrarError(
-        "Error lexico en linea " + (yyline + 1)
-        + ": literal char invalido "
+    registrarErrorLexico(
+        "literal char invalido "
         + yytext()
         + ". Un char debe contener exactamente un caracter."
     );
@@ -507,24 +500,8 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    3.12 COMILLAS MEZCLADAS
    ========================================== */
 
-{Char_Comillas_Mezcladas} {
-
-    registrarError(
-        "Error lexico en linea " + (yyline + 1)
-        + ": comillas mezcladas en literal "
-        + yytext()
-    );
-}
-
-
-{String_Comillas_Mezcladas} {
-
-    registrarError(
-        "Error lexico en linea " + (yyline + 1)
-        + ": comillas mezcladas en literal "
-        + yytext()
-    );
-}
+/* Esta sección está vacía - las reglas de comillas mezcladas
+   y sus acciones de error fueron eliminadas. */
 
 
 /* ==========================================
@@ -532,21 +509,15 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    ========================================== */
 
 {String_Sin_Cerrar} {
-
-    registrarError(
-        "Error lexico en linea " + (yyline + 1)
-        + ": string sin cerrar "
-        + yytext()
+    registrarErrorLexico(
+        "string sin cerrar " + yytext()
     );
 }
 
 
 {Char_Sin_Cerrar} {
-
-    registrarError(
-        "Error lexico en linea " + (yyline + 1)
-        + ": char sin cerrar "
-        + yytext()
+    registrarErrorLexico(
+        "char sin cerrar " + yytext()
     );
 }
 
@@ -572,6 +543,7 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
 "¡" {
 
     lineaInicioComentario = yyline + 1;
+    columnaInicioComentario = yycolumn + 1;
 
     yybegin(COMENTARIO_MULTI);
 }
@@ -598,6 +570,8 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
     registrarError(
         "Error lexico en linea "
         + lineaInicioComentario
+        + ", columna "
+        + columnaInicioComentario
         + ": comentario multilinea no fue cerrado con !"
     );
 
@@ -623,11 +597,7 @@ String_Comillas_Mezcladas = "\"" [^'\r\n]* "'"
    ========================================== */
 
 [^] {
-
-    registrarError(
-        "Error lexico en linea " + (yyline + 1)
-        + ": caracter no reconocido '"
-        + yytext()
-        + "'"
+    registrarErrorLexico(
+        "caracter no reconocido '" + yytext() + "'"
     );
 }
