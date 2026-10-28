@@ -28,17 +28,26 @@ parser code {:
             ? s.left
             : -1;
 
+        int columna =
+            (s != null && s.right >= 0)
+            ? s.right
+            : -1;
+
         String mensaje;
 
         if (s != null && s.sym == sym.EOF) {
             mensaje =
                 "[ERROR SINTACTICO] Linea "
                 + linea
+                + ", columna "
+                + columna
                 + ": fin de archivo inesperado.";
         } else {
             mensaje =
                 "[ERROR SINTACTICO] Linea "
                 + linea
+                + ", columna "
+                + columna
                 + ": token inesperado -> '"
                 + lexema
                 + "'";
@@ -55,9 +64,16 @@ parser code {:
             ? s.left
             : -1;
 
+        int columna =
+            (s != null && s.right >= 0)
+            ? s.right
+            : -1;
+
         String mensaje =
             "[ERROR SINTACTICO IRRECUPERABLE] Linea "
             + linea
+            + ", columna "
+            + columna
             + ": no se pudo continuar el analisis.";
 
         System.err.println(mensaje);
@@ -486,6 +502,10 @@ SENTENCIA ::=
       SENTENCIA_FOR
     ;
 
+SENTENCIA ::=
+      BLOQUE
+    ;
+
 
 /* ==========================================
    RECUPERACION EN MODO PANICO
@@ -665,12 +685,18 @@ EXPR_ARITMETICA ::=
    13. EXPRESIONES RELACIONALES
    ========================================== */
 
+/* Operandos relacionales generales */
+
 OPERANDO_RELACIONAL ::=
       EXPR_ARITMETICA
+    | EXPR_RELACIONAL
+    | EXPR_LOGICA
+    | EXPR_NEGACION_LOGICA
+    | LIT_BOOL
+    | LIT_CHAR
     ;
 
-
-/* ---- Menor ---- */
+/* Menor */
 
 EXPR_RELACIONAL ::=
       COR_INI OPERANDO_RELACIONAL COR_FIN
@@ -678,8 +704,7 @@ EXPR_RELACIONAL ::=
       COR_INI OPERANDO_RELACIONAL COR_FIN
     ;
 
-
-/* ---- Menor o igual ---- */
+/* Menor o igual */
 
 EXPR_RELACIONAL ::=
       COR_INI OPERANDO_RELACIONAL COR_FIN
@@ -687,8 +712,7 @@ EXPR_RELACIONAL ::=
       COR_INI OPERANDO_RELACIONAL COR_FIN
     ;
 
-
-/* ---- Mayor ---- */
+/* Mayor */
 
 EXPR_RELACIONAL ::=
       COR_INI OPERANDO_RELACIONAL COR_FIN
@@ -696,8 +720,7 @@ EXPR_RELACIONAL ::=
       COR_INI OPERANDO_RELACIONAL COR_FIN
     ;
 
-
-/* ---- Mayor o igual ---- */
+/* Mayor o igual */
 
 EXPR_RELACIONAL ::=
       COR_INI OPERANDO_RELACIONAL COR_FIN
@@ -705,40 +728,20 @@ EXPR_RELACIONAL ::=
       COR_INI OPERANDO_RELACIONAL COR_FIN
     ;
 
+/* Igual */
+
 EXPR_RELACIONAL ::=
       COR_INI OPERANDO_RELACIONAL COR_FIN
       IGUAL
       COR_INI OPERANDO_RELACIONAL COR_FIN
     ;
 
-EXPR_RELACIONAL ::=
-      COR_INI LIT_BOOL COR_FIN
-      IGUAL
-      COR_INI LIT_BOOL COR_FIN
-    ;
-
-EXPR_RELACIONAL ::=
-      COR_INI LIT_CHAR COR_FIN
-      IGUAL
-      COR_INI LIT_CHAR COR_FIN
-    ;
+/* Diferente */
 
 EXPR_RELACIONAL ::=
       COR_INI OPERANDO_RELACIONAL COR_FIN
       DIFERENTE
       COR_INI OPERANDO_RELACIONAL COR_FIN
-    ;
-
-EXPR_RELACIONAL ::=
-      COR_INI LIT_BOOL COR_FIN
-      DIFERENTE
-      COR_INI LIT_BOOL COR_FIN
-    ;
-
-EXPR_RELACIONAL ::=
-      COR_INI LIT_CHAR COR_FIN
-      DIFERENTE
-      COR_INI LIT_CHAR COR_FIN
     ;
 
 
@@ -760,6 +763,10 @@ OPERANDO_LOGICO ::=
 
 OPERANDO_LOGICO ::=
       EXPR_NEGACION_LOGICA
+    ;
+
+OPERANDO_LOGICO ::=
+      EXPR_LOGICA
     ;
 
 
@@ -790,10 +797,6 @@ EXPR_LOGICA ::=
 
 EXPR_NEGACION_LOGICA ::=
       NOT GRUPO_PARENTESIS
-    ;
-
-EXPR_NEGACION_LOGICA ::=
-      NOT PAR_INI EXPR_LOGICA PAR_FIN
     ;
 
 
